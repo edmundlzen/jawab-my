@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 import { Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 type HeaderProps = {
   onHamburgerClick: () => void;
@@ -11,7 +12,7 @@ type HeaderProps = {
 
 export default function Header(props: HeaderProps) {
   const router = useRouter();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { data: session, status } = useSession();
 
   return (
     <div
@@ -51,7 +52,7 @@ export default function Header(props: HeaderProps) {
       >
         <Icon icon="ant-design:search-outlined" className={"text-2xl flex-1"} />
       </div>
-      {!loggedIn ? (
+      {!(status === "authenticated") ? (
         router.pathname !== "/auth/login" && (
           <Button
             className={"mr-5 sm:ml-auto bg-red-400"}
@@ -63,7 +64,7 @@ export default function Header(props: HeaderProps) {
         )
       ) : (
         <div className={"ml-auto mr-4 flex justify-center items-center"}>
-          Logged in
+          Logged in as {session?.user?.name}
         </div>
       )}
     </div>
