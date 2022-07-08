@@ -56,7 +56,7 @@ export default function Header(props: HeaderProps) {
           <Button
             className={"mr-5 sm:ml-auto bg-red-400"}
             color={"red"}
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.push("/api/auth/signin")}
           >
             <Text>Login</Text>
           </Button>
