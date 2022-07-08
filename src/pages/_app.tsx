@@ -6,6 +6,8 @@ import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Head from "next/head";
+import { LoadingProvider } from "../hooks/useLoading";
+import { NotificationsProvider } from "@mantine/notifications";
 
 const MyApp: AppType = ({
   Component,
@@ -17,7 +19,11 @@ const MyApp: AppType = ({
         <link rel="icon" href="/images/favicon.ico" />
       </Head>
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+        <NotificationsProvider>
+          <LoadingProvider>
+            <Component {...pageProps} />
+          </LoadingProvider>
+        </NotificationsProvider>
       </SessionProvider>
     </>
   );
