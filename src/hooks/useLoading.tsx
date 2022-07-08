@@ -13,7 +13,7 @@ export function LoadingProvider({ children }: { children: any }) {
   );
 }
 
-export function useLoading() {
+function useLoading() {
   const context: {
     loading: boolean;
     setLoading: (loading: boolean) => void | null;
