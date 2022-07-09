@@ -1,12 +1,20 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { Form, Subject } from "@prisma/client";
+import { Form, Subject, Question, VoteType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 export const questionsRouter = createRouter()
   .query("getAll", {
     async resolve({ ctx }) {
-      return await ctx.prisma.question.findMany();
+      const questions = await ctx.prisma.question.findMany({
+        include: { votes: true, tags: true, user: true },
+      });
+      return questions.map((question) => ({
+        ...question,
+        votesCount: question.votes.reduce((acc, vote) => {
+          return acc + (vote.voteType === VoteType.up ? 1 : -1);
+        }, 0),
+      }));
     },
   })
   .middleware(async ({ ctx, next }) => {
@@ -26,7 +34,6 @@ export const questionsRouter = createRouter()
       tags: z.array(z.string().min(1).max(30)).max(5),
     }),
     async resolve({ ctx, input }) {
-      console.log(ctx.session);
       return await ctx.prisma.question.create({
         data: {
           subject: input.subject,
