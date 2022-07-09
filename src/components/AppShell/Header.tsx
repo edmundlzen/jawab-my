@@ -52,7 +52,7 @@ export default function Header(props: HeaderProps) {
       >
         <Icon icon="ant-design:search-outlined" className={"text-2xl flex-1"} />
       </div>
-      {!(status === "authenticated") ? (
+      {status !== "authenticated" ? (
         router.pathname !== "/auth/login" && (
           <Button
             className={"mr-5 sm:ml-auto bg-red-400"}
