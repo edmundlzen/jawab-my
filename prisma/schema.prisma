@@ -99,6 +99,7 @@ model Question {
     userId    String
     tags      Tag[]
     votes     QuestionVote[]
+    answers   Answer[]
     user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt DateTime       @default(now())
     updatedAt DateTime       @default(now())
@@ -130,6 +131,7 @@ model Answer {
     userId    String
     votes     AnswerVote[]
     user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    question  Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
     createdAt DateTime       @default(now())
     updatedAt DateTime       @default(now())
 
