@@ -5,14 +5,12 @@ import superjson from "superjson";
 import { authRouter } from "./auth";
 import { questionsRouter } from "./questions";
 import { answersRouter } from "./answers";
-import { votesRouter } from "./votes";
 
 export const appRouter = createRouter()
     .transformer(superjson)
     .merge("auth.", authRouter)
     .merge("questions.", questionsRouter)
-    .merge("answers.", answersRouter)
-    .merge("votes.", votesRouter);
+    .merge("answers.", answersRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
