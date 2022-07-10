@@ -64,4 +64,57 @@ export const votesRouter = createRouter()
                 },
             });
         },
+    })
+    .mutation("createAnswerVote", {
+        input: z.object({
+            answerId: z.string().min(1).max(100),
+            voteType: z.nativeEnum(VoteType),
+        }),
+        async resolve({ ctx, input }) {
+            try {
+                return await ctx.prisma.answerVote.create({
+                    data: {
+                        userId: ctx.session!.userId as string,
+                        answerId: input.answerId,
+                        voteType: input.voteType,
+                    },
+                });
+            } catch (e) {
+                if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                    if (e.code === "P2002") {
+                        throw new TRPCError({ code: "BAD_REQUEST" });
+                    }
+                }
+            }
+        },
+    })
+    .mutation("updateAnswerVoteType", {
+        input: z.object({
+            answerId: z.string().min(1).max(100),
+            voteType: z.nativeEnum(VoteType),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.answerVote.updateMany({
+                where: {
+                    userId: ctx.session!.userId as string,
+                    answerId: input.answerId,
+                },
+                data: {
+                    voteType: input.voteType,
+                },
+            });
+        },
+    })
+    .mutation("deleteAnswerVote", {
+        input: z.object({
+            answerId: z.string().min(1).max(100),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.answerVote.deleteMany({
+                where: {
+                    userId: ctx.session!.userId as string,
+                    answerId: input.answerId,
+                },
+            });
+        },
     });
