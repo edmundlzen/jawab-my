@@ -49,6 +49,8 @@ model User {
     sessions      Session[]
     questions     Question[]
     questionVotes QuestionVote[]
+    answers       Answer[]
+    answerVotes   AnswerVote[]
 }
 
 model VerificationToken {
@@ -83,6 +85,11 @@ enum Form {
     five
 }
 
+enum VoteType {
+    up
+    down
+}
+
 model Question {
     id        String         @id @default(cuid())
     subject   Subject
@@ -97,19 +104,6 @@ model Question {
     updatedAt DateTime       @default(now())
 }
 
-model Tag {
-    id        String     @id @default(cuid())
-    name      String     @unique
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @default(now())
-    questions Question[]
-}
-
-enum VoteType {
-    up
-    down
-}
-
 model QuestionVote {
     id         Int      @id @default(autoincrement())
     userId     String
@@ -119,4 +113,34 @@ model QuestionVote {
     question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
     @@unique([userId, questionId])
+}
+
+model Tag {
+    id        String     @id @default(cuid())
+    name      String     @unique
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @default(now())
+    questions Question[]
+}
+
+model Answer {
+    id        String         @id @default(cuid())
+    questionId String
+    content   String
+    userId    String
+    votes     AnswerVote[]
+    user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @default(now())
+}
+
+model AnswerVote {
+    id         Int      @id @default(autoincrement())
+    userId     String
+    answerId   String
+    voteType   VoteType
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, answerId])
 }
