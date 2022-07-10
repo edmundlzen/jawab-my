@@ -55,4 +55,59 @@ export const questionsRouter = createRouter()
                 },
             });
         },
+    })
+    .mutation("vote", {
+        input: z.object({
+            questionId: z.string().min(1).max(100),
+            voteType: z.nativeEnum(VoteType),
+            remove: z.boolean().optional(),
+        }),
+        async resolve({ ctx, input }) {
+            const { questionId, voteType, remove } = input;
+            const userId = ctx.session!.userId as string;
+
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: questionId },
+            });
+
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            const vote = await ctx.prisma.questionVote.findMany({
+                where: {
+                    questionId,
+                    userId,
+                },
+            });
+
+            if (vote.length > 0) {
+                if (remove) {
+                    await ctx.prisma.questionVote.deleteMany({
+                        where: {
+                            questionId,
+                            userId,
+                        },
+                    });
+                } else {
+                    await ctx.prisma.questionVote.updateMany({
+                        where: {
+                            questionId,
+                            userId,
+                        },
+                        data: {
+                            voteType,
+                        },
+                    });
+                }
+            } else {
+                await ctx.prisma.questionVote.create({
+                    data: {
+                        questionId,
+                        userId,
+                        voteType,
+                    },
+                });
+            }
+        },
     });

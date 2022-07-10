@@ -49,4 +49,59 @@ export const answersRouter = createRouter()
                 }
             }
         },
+    })
+    .mutation("vote", {
+        input: z.object({
+            answerId: z.string().min(1).max(100),
+            voteType: z.nativeEnum(VoteType),
+            remove: z.boolean().optional(),
+        }),
+        async resolve({ ctx, input }) {
+            const { answerId, voteType, remove } = input;
+            const userId = ctx.session!.userId as string;
+
+            const answer = await ctx.prisma.answer.findUnique({
+                where: { id: answerId },
+            });
+
+            if (!answer) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            const vote = await ctx.prisma.answerVote.findMany({
+                where: {
+                    answerId,
+                    userId,
+                },
+            });
+
+            if (vote.length > 0) {
+                if (remove) {
+                    await ctx.prisma.answerVote.deleteMany({
+                        where: {
+                            answerId,
+                            userId,
+                        },
+                    });
+                } else {
+                    await ctx.prisma.answerVote.updateMany({
+                        where: {
+                            answerId,
+                            userId,
+                        },
+                        data: {
+                            voteType,
+                        },
+                    });
+                }
+            } else {
+                await ctx.prisma.answerVote.create({
+                    data: {
+                        answerId,
+                        userId,
+                        voteType,
+                    },
+                });
+            }
+        },
     });
