@@ -12,109 +12,113 @@ export const votesRouter = createRouter()
         }
         return next();
     })
-    .mutation("createQuestionVote", {
+    .mutation("question", {
         input: z.object({
             questionId: z.string().min(1).max(100),
             voteType: z.nativeEnum(VoteType),
+            remove: z.boolean().optional(),
         }),
         async resolve({ ctx, input }) {
-            try {
-                return await ctx.prisma.questionVote.create({
+            const { questionId, voteType, remove } = input;
+            const userId = ctx.session!.userId as string;
+
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: questionId },
+            });
+
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            const vote = await ctx.prisma.questionVote.findMany({
+                where: {
+                    questionId,
+                    userId,
+                },
+            });
+
+            if (vote.length > 0) {
+                if (remove) {
+                    await ctx.prisma.questionVote.deleteMany({
+                        where: {
+                            questionId,
+                            userId,
+                        },
+                    });
+                } else {
+                    await ctx.prisma.questionVote.updateMany({
+                        where: {
+                            questionId,
+                            userId,
+                        },
+                        data: {
+                            voteType,
+                        },
+                    });
+                }
+            } else {
+                await ctx.prisma.questionVote.create({
                     data: {
-                        userId: ctx.session!.userId as string,
-                        questionId: input.questionId,
-                        voteType: input.voteType,
+                        questionId,
+                        userId,
+                        voteType,
                     },
                 });
-            } catch (e) {
-                if (e instanceof Prisma.PrismaClientKnownRequestError) {
-                    if (e.code === "P2002") {
-                        throw new TRPCError({ code: "BAD_REQUEST" });
-                    }
-                }
             }
         },
     })
-    .mutation("updateQuestionVoteType", {
-        input: z.object({
-            questionId: z.string().min(1).max(100),
-            voteType: z.nativeEnum(VoteType),
-        }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.questionVote.updateMany({
-                where: {
-                    userId: ctx.session!.userId as string,
-                    questionId: input.questionId,
-                },
-                data: {
-                    voteType: input.voteType,
-                },
-            });
-        },
-    })
-    .mutation("deleteQuestionVote", {
-        input: z.object({
-            questionId: z.string().min(1).max(100),
-        }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.questionVote.deleteMany({
-                where: {
-                    userId: ctx.session!.userId as string,
-                    questionId: input.questionId,
-                },
-            });
-        },
-    })
-    .mutation("createAnswerVote", {
+    .mutation("answer", {
         input: z.object({
             answerId: z.string().min(1).max(100),
             voteType: z.nativeEnum(VoteType),
+            remove: z.boolean().optional(),
         }),
         async resolve({ ctx, input }) {
-            try {
-                return await ctx.prisma.answerVote.create({
+            const { answerId, voteType, remove } = input;
+            const userId = ctx.session!.userId as string;
+
+            const answer = await ctx.prisma.answer.findUnique({
+                where: { id: answerId },
+            });
+
+            if (!answer) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            const vote = await ctx.prisma.answerVote.findMany({
+                where: {
+                    answerId,
+                    userId,
+                },
+            });
+
+            if (vote.length > 0) {
+                if (remove) {
+                    await ctx.prisma.answerVote.deleteMany({
+                        where: {
+                            answerId,
+                            userId,
+                        },
+                    });
+                } else {
+                    await ctx.prisma.answerVote.updateMany({
+                        where: {
+                            answerId,
+                            userId,
+                        },
+                        data: {
+                            voteType,
+                        },
+                    });
+                }
+            } else {
+                await ctx.prisma.answerVote.create({
                     data: {
-                        userId: ctx.session!.userId as string,
-                        answerId: input.answerId,
-                        voteType: input.voteType,
+                        answerId,
+                        userId,
+                        voteType,
                     },
                 });
-            } catch (e) {
-                if (e instanceof Prisma.PrismaClientKnownRequestError) {
-                    if (e.code === "P2002") {
-                        throw new TRPCError({ code: "BAD_REQUEST" });
-                    }
-                }
             }
-        },
-    })
-    .mutation("updateAnswerVoteType", {
-        input: z.object({
-            answerId: z.string().min(1).max(100),
-            voteType: z.nativeEnum(VoteType),
-        }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.answerVote.updateMany({
-                where: {
-                    userId: ctx.session!.userId as string,
-                    answerId: input.answerId,
-                },
-                data: {
-                    voteType: input.voteType,
-                },
-            });
-        },
-    })
-    .mutation("deleteAnswerVote", {
-        input: z.object({
-            answerId: z.string().min(1).max(100),
-        }),
-        async resolve({ ctx, input }) {
-            return await ctx.prisma.answerVote.deleteMany({
-                where: {
-                    userId: ctx.session!.userId as string,
-                    answerId: input.answerId,
-                },
-            });
         },
     });
