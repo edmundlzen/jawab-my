@@ -50,6 +50,28 @@ export const answersRouter = createRouter()
             }
         },
     })
+    .mutation("delete", {
+        input: z.object({
+            answerId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const answer = await ctx.prisma.answer.findUnique({
+                where: { id: input.answerId },
+            });
+
+            if (!answer) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            if (answer.userId !== ctx.session!.userId) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            return ctx.prisma.answer.delete({
+                where: { id: input.answerId },
+            });
+        },
+    })
     .mutation("vote", {
         input: z.object({
             answerId: z.string().min(1).max(100),
