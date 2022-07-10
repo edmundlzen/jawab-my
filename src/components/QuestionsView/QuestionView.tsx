@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { InferQueryOutput } from "../../utils/trpc";
 
-type QuestionsOutput = InferQueryOutput<'questions.getAll'>
+type QuestionsOutput = InferQueryOutput<"questions.getAll">;
 
 interface QuestionViewProps {
   title: string;
