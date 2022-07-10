@@ -8,6 +8,7 @@ import "../styles/globals.css";
 import Head from "next/head";
 import { LoadingProvider } from "../hooks/useLoading";
 import { NotificationsProvider } from "@mantine/notifications";
+import { ModalsProvider } from "@mantine/modals";
 
 const MyApp: AppType = ({
     Component,
@@ -20,9 +21,11 @@ const MyApp: AppType = ({
             </Head>
             <SessionProvider session={session}>
                 <NotificationsProvider>
-                    <LoadingProvider>
-                        <Component {...pageProps} />
-                    </LoadingProvider>
+                    <ModalsProvider>
+                        <LoadingProvider>
+                            <Component {...pageProps} />
+                        </LoadingProvider>
+                    </ModalsProvider>
                 </NotificationsProvider>
             </SessionProvider>
         </>
