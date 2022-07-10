@@ -2,9 +2,9 @@
 import type { AppRouter } from "../server/router";
 import { createReactQueryHooks } from "@trpc/react";
 import type {
-  inferProcedureOutput,
-  inferProcedureInput,
-  inferSubscriptionOutput,
+    inferProcedureOutput,
+    inferProcedureInput,
+    inferSubscriptionOutput,
 } from "@trpc/server";
 
 export const trpc = createReactQueryHooks<AppRouter>();
@@ -29,7 +29,7 @@ export type TSubscription = keyof AppRouter["_def"]["subscriptions"];
  * @example type HelloOutput = InferQueryOutput<'hello'>
  */
 export type InferQueryOutput<TRouteKey extends TQuery> = inferProcedureOutput<
-  AppRouter["_def"]["queries"][TRouteKey]
+    AppRouter["_def"]["queries"][TRouteKey]
 >;
 
 /**
@@ -37,7 +37,7 @@ export type InferQueryOutput<TRouteKey extends TQuery> = inferProcedureOutput<
  * @example type HelloInput = InferQueryInput<'hello'>
  */
 export type InferQueryInput<TRouteKey extends TQuery> = inferProcedureInput<
-  AppRouter["_def"]["queries"][TRouteKey]
+    AppRouter["_def"]["queries"][TRouteKey]
 >;
 
 /**
@@ -45,32 +45,32 @@ export type InferQueryInput<TRouteKey extends TQuery> = inferProcedureInput<
  * @example type HelloOutput = InferMutationOutput<'hello'>
  */
 export type InferMutationOutput<TRouteKey extends TMutation> =
-  inferProcedureOutput<AppRouter["_def"]["mutations"][TRouteKey]>;
+    inferProcedureOutput<AppRouter["_def"]["mutations"][TRouteKey]>;
 
 /**
  * This is a helper method to infer the input of a mutation resolver
  * @example type HelloInput = InferMutationInput<'hello'>
  */
 export type InferMutationInput<TRouteKey extends TMutation> =
-  inferProcedureInput<AppRouter["_def"]["mutations"][TRouteKey]>;
+    inferProcedureInput<AppRouter["_def"]["mutations"][TRouteKey]>;
 
 /**
  * This is a helper method to infer the output of a subscription resolver
  * @example type HelloOutput = InferSubscriptionOutput<'hello'>
  */
 export type InferSubscriptionOutput<TRouteKey extends TSubscription> =
-  inferProcedureOutput<AppRouter["_def"]["subscriptions"][TRouteKey]>;
+    inferProcedureOutput<AppRouter["_def"]["subscriptions"][TRouteKey]>;
 
 /**
  * This is a helper method to infer the asynchronous output of a subscription resolver
  * @example type HelloAsyncOutput = InferAsyncSubscriptionOutput<'hello'>
  */
 export type InferAsyncSubscriptionOutput<TRouteKey extends TSubscription> =
-  inferSubscriptionOutput<AppRouter, TRouteKey>;
+    inferSubscriptionOutput<AppRouter, TRouteKey>;
 
 /**
  * This is a helper method to infer the input of a subscription resolver
  * @example type HelloInput = InferSubscriptionInput<'hello'>
  */
 export type InferSubscriptionInput<TRouteKey extends TSubscription> =
-  inferProcedureInput<AppRouter["_def"]["subscriptions"][TRouteKey]>;
+    inferProcedureInput<AppRouter["_def"]["subscriptions"][TRouteKey]>;

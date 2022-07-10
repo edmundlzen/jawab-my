@@ -10,54 +10,54 @@ import { LoadingProvider } from "../hooks/useLoading";
 import { NotificationsProvider } from "@mantine/notifications";
 
 const MyApp: AppType = ({
-  Component,
-  pageProps: { session, ...pageProps },
+    Component,
+    pageProps: { session, ...pageProps },
 }) => {
-  return (
-    <>
-      <Head>
-        <link rel="icon" href="/images/favicon.ico" />
-      </Head>
-      <SessionProvider session={session}>
-        <NotificationsProvider>
-          <LoadingProvider>
-            <Component {...pageProps} />
-          </LoadingProvider>
-        </NotificationsProvider>
-      </SessionProvider>
-    </>
-  );
+    return (
+        <>
+            <Head>
+                <link rel="icon" href="/images/favicon.ico" />
+            </Head>
+            <SessionProvider session={session}>
+                <NotificationsProvider>
+                    <LoadingProvider>
+                        <Component {...pageProps} />
+                    </LoadingProvider>
+                </NotificationsProvider>
+            </SessionProvider>
+        </>
+    );
 };
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    return "";
-  }
-  if (process.browser) return ""; // Browser should use current path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+    if (typeof window !== "undefined") {
+        return "";
+    }
+    if (process.browser) return ""; // Browser should use current path
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
 
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+    return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
 export default withTRPC<AppRouter>({
-  config({ ctx }) {
+    config({ ctx }) {
+        /**
+         * If you want to use SSR, you need to use the server's full URL
+         * @link https://trpc.io/docs/ssr
+         */
+        const url = `${getBaseUrl()}/api/trpc`;
+
+        return {
+            url,
+            transformer: superjson,
+            /**
+             * @link https://react-query.tanstack.com/reference/QueryClient
+             */
+            // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
+        };
+    },
     /**
-     * If you want to use SSR, you need to use the server's full URL
      * @link https://trpc.io/docs/ssr
      */
-    const url = `${getBaseUrl()}/api/trpc`;
-
-    return {
-      url,
-      transformer: superjson,
-      /**
-       * @link https://react-query.tanstack.com/reference/QueryClient
-       */
-      // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
-    };
-  },
-  /**
-   * @link https://trpc.io/docs/ssr
-   */
-  ssr: false,
+    ssr: false,
 })(MyApp);

@@ -7,21 +7,21 @@ import { useEffect } from "react";
 import { useLoading } from "../hooks";
 
 const Home: NextPage = () => {
-  const questions = trpc.useQuery(["questions.getAll"]);
-  const { setLoading } = useLoading();
+    const questions = trpc.useQuery(["questions.getAll"]);
+    const { setLoading } = useLoading();
 
-  useEffect(() => {
-    if (!setLoading) return;
-    setLoading(questions.isLoading);
-  }, [questions, setLoading]);
+    useEffect(() => {
+        if (!setLoading) return;
+        setLoading(questions.isLoading);
+    }, [questions, setLoading]);
 
-  return (
-    <Layout>
-      {questions.data && (
-        <QuestionView questions={questions.data} title="Questions" />
-      )}
-    </Layout>
-  );
+    return (
+        <Layout>
+            {questions.data && (
+                <QuestionView questions={questions.data} title="Questions" />
+            )}
+        </Layout>
+    );
 };
 
 export default Home;
