@@ -1,6 +1,6 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { Form, Subject, Question, VoteType } from "@prisma/client";
+import { Form, Subject, VoteType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 export const questionsRouter = createRouter()
@@ -15,6 +15,37 @@ export const questionsRouter = createRouter()
                     return acc + (vote.voteType === VoteType.up ? 1 : -1);
                 }, 0),
             }));
+        },
+    })
+    .query("getById", {
+        input: z.object({
+            questionId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: input.questionId },
+                include: {
+                    votes: true,
+                    tags: true,
+                    user: true,
+                    answers: { include: { votes: true, user: true } },
+                },
+            });
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            return {
+                ...question,
+                votesCount: question.votes.reduce((acc, vote) => {
+                    return acc + (vote.voteType === VoteType.up ? 1 : -1);
+                }, 0),
+                answers: question.answers.map((answer) => ({
+                    ...answer,
+                    votesCount: answer.votes.reduce((acc, vote) => {
+                        return acc + (vote.voteType === VoteType.up ? 1 : -1);
+                    }, 0),
+                })),
+            };
         },
     })
     .middleware(async ({ ctx, next }) => {
