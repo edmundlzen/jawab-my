@@ -24,6 +24,7 @@ const QuestionPost = (props: QuestionPostProps) => {
     const { loading, setLoading } = useLoading();
     const { data: session, status } = useSession();
     const questionsVote = trpc.useMutation(["questions.vote"]);
+    const deleteQuestion = trpc.useMutation(["questions.delete"]);
     const utils = trpc.useContext();
     const router = useRouter();
     const modals = useModals();
@@ -49,27 +50,42 @@ const QuestionPost = (props: QuestionPostProps) => {
             });
             return;
         }
-
+        setLoading(true);
         if (voteButtonClickType === voteType) {
             // Unvote
             setVoteType(null);
-            await questionsVote.mutateAsync({
-                questionId: props.question.id,
-                voteType: VoteType.up,
-                remove: true,
-            });
-            utils.invalidateQueries(["questions.getById"]);
-            return;
+            try {
+                await questionsVote.mutateAsync({
+                    questionId: props.question.id,
+                    voteType: VoteType.up,
+                    remove: true,
+                });
+                utils.invalidateQueries(["questions.getById"]);
+            } catch (e: any) {
+                showNotification({
+                    title: "Error",
+                    message: e,
+                });
+                setVoteType(voteType);
+            }
         } else {
             // Vote
             setVoteType(voteButtonClickType);
-            await questionsVote.mutateAsync({
-                questionId: props.question.id,
-                voteType: voteButtonClickType,
-                remove: false,
-            });
-            utils.invalidateQueries(["questions.getById"]);
-            return;
+            try {
+                await questionsVote.mutateAsync({
+                    questionId: props.question.id,
+                    voteType: voteButtonClickType,
+                    remove: false,
+                });
+                utils.invalidateQueries(["questions.getById"]);
+            } catch (e: any) {
+                showNotification({
+                    title: "Error",
+                    message: e,
+                });
+                setVoteType(voteType);
+            }
+            setLoading(false);
         }
     };
 
@@ -100,50 +116,44 @@ const QuestionPost = (props: QuestionPostProps) => {
     // 	}
     // }
 
-    // const handleDeletePostButtonClick = () => {
-    // 	modals.openConfirmModal({
-    // 		title: 'Delete your question?',
-    // 		children: (
-    // 			<Text size="sm">
-    // 				Are you sure you want to delete your question?
-    // 			</Text>
-    // 		),
-    // 		labels: {confirm: 'Confirm', cancel: 'Cancel'},
-    // 		confirmProps: {
-    // 			className: 'bg-red-500',
-    // 			color: 'red'
-    // 		},
-    // 		onCancel: () => {
-    // 		},
-    // 		onConfirm: async () => {
-    // 			setLoading(true)
-    // 			try {
-    // 				const accessToken = await getToken({'hasura'});
-    // 				if (!accessToken) return;
-    // 				await api(accessToken)?.({
-    // 					method: 'delete',
-    // 					url: '/questions',
-    // 					data: {
-    // 						questionId: router.query.question_id,
-    // 					}
-    // 				});
-    // 				showNotification({
-    // 					title: 'Question deleted',
-    // 					message: 'Your question has been deleted',
-    // 				});
-    // 				await router.replace('/');
-    // 				return;
-    // 			} catch (e) {
-    // 				showNotification({
-    // 					title: 'Error',
-    // 					message: 'Something went wrong',
-    // 				})
-    // 				setLoading(false)
-    // 				return;
-    // 			}
-    // 		},
-    // 	});
-    // }
+    const handleDeletePostButtonClick = () => {
+        modals.openConfirmModal({
+            title: "Delete your question?",
+            children: (
+                <Text size="sm">
+                    Are you sure you want to delete your question?
+                </Text>
+            ),
+            labels: { confirm: "Confirm", cancel: "Cancel" },
+            confirmProps: {
+                className: "bg-red-500",
+                color: "red",
+            },
+            onCancel: () => {},
+            onConfirm: async () => {
+                setLoading(true);
+                try {
+                    await deleteQuestion.mutateAsync({
+                        questionId: props.question.id,
+                    });
+                    showNotification({
+                        title: "Question deleted",
+                        message: "Your question has been deleted",
+                    });
+                    utils.invalidateQueries(["questions.getById"]);
+                    router.back();
+                    return;
+                } catch (e) {
+                    showNotification({
+                        title: "Error",
+                        message: "Something went wrong",
+                    });
+                    setLoading(false);
+                    return;
+                }
+            },
+        });
+    };
 
     return (
         <div className={""}>
@@ -222,16 +232,24 @@ const QuestionPost = (props: QuestionPostProps) => {
                                 </span>
                             </Text>
                             <div className={"flex mt-2"}>
-                                {/* {
-									isOwner && (
-										<div className={'cursor-pointer select-none group'}
-											 onClick={() => handleDeletePostButtonClick()}>
-											<Text className={'text-xs text-red-600 group-hover:font-semibold'}>
-												Delete
-											</Text>
-										</div>
-									)
-								} */}
+                                {props.question.user.id === session!.userId && (
+                                    <div
+                                        className={
+                                            "cursor-pointer select-none group"
+                                        }
+                                        onClick={() =>
+                                            handleDeletePostButtonClick()
+                                        }
+                                    >
+                                        <Text
+                                            className={
+                                                "text-xs text-red-600 group-hover:font-semibold"
+                                            }
+                                        >
+                                            Delete
+                                        </Text>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
