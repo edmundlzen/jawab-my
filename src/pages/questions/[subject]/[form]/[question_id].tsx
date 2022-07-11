@@ -12,6 +12,7 @@ import { useLoading } from "../../../../hooks";
 import { InferQueryOutput, trpc } from "../../../../utils/trpc";
 import { useSession } from "next-auth/react";
 import { Editor } from "@mantine/rte";
+import moment from "moment";
 
 // type QuestionsOutput = InferQueryOutput<"questions.getAll">;
 
@@ -107,13 +108,13 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
                         <Text className={"text-xs"}>
                             Asked{" "}
                             <span className={"font-semibold"}>
-                                {questionPost.data.createdAt.toISOString()}
+                                {moment(questionPost.data.createdAt).fromNow()}
                             </span>
                         </Text>
                         <Text className={"text-xs"}>
                             Updated{" "}
                             <span className={"font-semibold"}>
-                                {questionPost.data.updatedAt.toISOString()}
+                                {moment(questionPost.data.updatedAt).fromNow()}
                             </span>
                         </Text>
                         <Text className={"text-xs"}>
