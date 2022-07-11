@@ -3,10 +3,29 @@ import { z } from "zod";
 import { Form, Subject, VoteType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
+// TODO: Add some limits to the query
+
 export const questionsRouter = createRouter()
     .query("getAll", {
         async resolve({ ctx }) {
             const questions = await ctx.prisma.question.findMany({
+                include: { votes: true, tags: true, user: true },
+            });
+            return questions.map((question) => ({
+                ...question,
+                votesCount: question.votes.reduce((acc, vote) => {
+                    return acc + (vote.voteType === VoteType.up ? 1 : -1);
+                }, 0),
+            }));
+        },
+    })
+    .query("getBySubject", {
+        input: z.object({
+            subject: z.nativeEnum(Subject),
+        }),
+        async resolve({ ctx, input }) {
+            const questions = await ctx.prisma.question.findMany({
+                where: { subject: input.subject },
                 include: { votes: true, tags: true, user: true },
             });
             return questions.map((question) => ({
