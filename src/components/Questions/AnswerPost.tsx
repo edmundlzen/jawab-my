@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
 import { VoteType } from "@prisma/client";
 import CommentsSection from "./CommentsSection";
+import moment from "moment";
 
 type QuestionsGetByIdOutput = InferQueryOutput<"questions.getById">;
 
@@ -173,6 +174,10 @@ const AnswerPost = (props: AnswerProps) => {
                                 <span className={"font-semibold"}>
                                     {props.answer.user.name}
                                 </span>
+                                <br />
+                                <div className="font-semibold">
+                                    {moment(props.answer.createdAt).fromNow()}
+                                </div>
                             </Text>
                             <div className={"flex mt-2"}>
                                 {props.answer.user.id === session?.userId && (
