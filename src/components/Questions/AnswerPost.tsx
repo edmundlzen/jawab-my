@@ -36,7 +36,7 @@ const AnswerPost = (props: AnswerProps) => {
             });
             return;
         }
-
+        setLoading(true);
         if (voteButtonClickType === voteType) {
             // Unvote
             setVoteType(null);
@@ -45,8 +45,6 @@ const AnswerPost = (props: AnswerProps) => {
                 voteType: VoteType.up,
                 remove: true,
             });
-            utils.invalidateQueries(["answers.getAllForQuestion"]);
-            return;
         } else {
             // Vote
             setVoteType(voteButtonClickType);
@@ -55,37 +53,10 @@ const AnswerPost = (props: AnswerProps) => {
                 voteType: voteButtonClickType,
                 remove: false,
             });
-            utils.invalidateQueries(["answers.getAllForQuestion"]);
-            return;
         }
+        utils.invalidateQueries(["questions.getById"]);
+        setLoading(false);
     };
-
-    // const handleCommentSubmit = async (comment: string) => {
-    // 	setLoading(true)
-    // 	try {
-    // 		const accessToken = await getToken({'hasura'});
-    // 		if (!accessToken) return;
-    // 		await api(accessToken)?.({
-    // 			method: 'post',
-    // 			url: '/comments',
-    // 			data: {
-    // 				answerId: props.answer.id,
-    // 				content: comment,
-    // 			}
-    // 		});
-    // 		showNotification({
-    // 			title: 'Comment added',
-    // 			message: 'Your comment has been added',
-    // 		})
-    // 		router.reload();
-    // 	} catch (e) {
-    // 		showNotification({
-    // 			title: 'Error',
-    // 			message: 'Something went wrong',
-    // 		})
-    // 		setLoading(false)
-    // 	}
-    // }
 
     const handleDeleteAnswerButtonClick = () => {
         modals.openConfirmModal({
