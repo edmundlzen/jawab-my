@@ -9,13 +9,15 @@ export const questionsRouter = createRouter()
     .query("getAll", {
         async resolve({ ctx }) {
             const questions = await ctx.prisma.question.findMany({
-                include: { votes: true, tags: true, user: true },
+                include: { votes: true, tags: true, user: true, answers: true },
             });
             return questions.map((question) => ({
                 ...question,
                 votesCount: question.votes.reduce((acc, vote) => {
                     return acc + (vote.voteType === VoteType.up ? 1 : -1);
                 }, 0),
+                answers: undefined,
+                answersCount: question.answers.length,
             }));
         },
     })
