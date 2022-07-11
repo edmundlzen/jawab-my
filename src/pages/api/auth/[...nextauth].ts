@@ -14,20 +14,20 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_ID as string,
             clientSecret: process.env.GOOGLE_SECRET as string,
         }),
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                name: {
-                    label: "Name",
-                    type: "text",
-                    placeholder: "Enter your name",
-                },
-            },
-            async authorize(credentials, _req) {
-                const user = { id: 1, name: credentials?.name ?? "J Smith" };
-                return user;
-            },
-        }),
+        // CredentialsProvider({
+        //     name: "Credentials",
+        //     credentials: {
+        //         name: {
+        //             label: "Name",
+        //             type: "text",
+        //             placeholder: "Enter your name",
+        //         },
+        //     },
+        //     async authorize(credentials, _req) {
+        //         const user = { id: 1, name: credentials?.name ?? "J Smith" };
+        //         return user;
+        //     },
+        // }),
     ],
     callbacks: {
         async session({ session, token, user }) {
