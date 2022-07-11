@@ -140,6 +140,7 @@ const Ask: NextPage = () => {
                             className={"min-h-[50vh]"}
                             value={questionContent}
                             onChange={setQuestionContent}
+                            editorRef={null}
                             // controls={[
                             // 	['bold', 'italic', 'underline', 'link', 'image'],
                             // 	['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
