@@ -49,8 +49,10 @@ model User {
     sessions      Session[]
     questions     Question[]
     questionVotes QuestionVote[]
+    questionComments QuestionComment[]
     answers       Answer[]
     answerVotes   AnswerVote[]
+    answerComments   AnswerComment[]
 }
 
 model VerificationToken {
@@ -100,6 +102,7 @@ model Question {
     tags      Tag[]
     votes     QuestionVote[]
     answers   Answer[]
+    comments  QuestionComment[]
     user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt DateTime       @default(now())
     updatedAt DateTime       @default(now())
@@ -116,6 +119,15 @@ model QuestionVote {
     @@unique([userId, questionId])
 }
 
+model QuestionComment {
+    id         String   @id @default(cuid())
+    userId     String
+    questionId String
+    content    String
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
 model Tag {
     id        String     @id @default(cuid())
     name      String     @unique
@@ -130,6 +142,7 @@ model Answer {
     content   String
     userId    String
     votes     AnswerVote[]
+    comments   AnswerComment[]
     user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
     question  Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
     createdAt DateTime       @default(now())
@@ -147,4 +160,15 @@ model AnswerVote {
     answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
 
     @@unique([userId, answerId])
+}
+
+model AnswerComment {
+    id        String         @id @default(cuid())
+    answerId  String
+    content   String
+    userId    String
+    user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    answer    Answer         @relation(fields: [answerId], references: [id], onDelete: Cascade)
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @default(now())
 }
