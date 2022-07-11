@@ -206,7 +206,7 @@ const QuestionPost = (props: QuestionPostProps) => {
                                 </span>
                             </Text>
                             <div className={"flex mt-2"}>
-                                {props.question.user.id === session!.userId && (
+                                {props.question.user.id === session?.userId && (
                                     <div
                                         className={
                                             "cursor-pointer select-none group"
