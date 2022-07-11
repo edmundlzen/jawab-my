@@ -138,7 +138,9 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
                                 <Button
                                     className={"bg-red-400 mt-4"}
                                     color={"red"}
-                                    onClick={() => router.push("/auth/login")}
+                                    onClick={() =>
+                                        router.push("/api/auth/signin")
+                                    }
                                 >
                                     Login
                                 </Button>
