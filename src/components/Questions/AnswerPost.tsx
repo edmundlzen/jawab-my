@@ -28,6 +28,19 @@ const AnswerPost = (props: AnswerProps) => {
     const modals = useModals();
     const router = useRouter();
 
+    useEffect(() => {
+        if (status === "authenticated") {
+            setLoading(true);
+            // Check if user has voted for this question
+            props.answer.votes.forEach((vote) => {
+                if (vote.userId === session.userId) {
+                    setVoteType(vote.voteType);
+                }
+            });
+            setLoading(false);
+        }
+    }, [props.answer, session, status, setLoading]);
+
     const handleVoteButtonClick = async (voteButtonClickType: VoteType) => {
         if (status !== "authenticated") {
             showNotification({
