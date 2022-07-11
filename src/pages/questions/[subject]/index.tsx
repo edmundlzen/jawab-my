@@ -1,4 +1,4 @@
-import { NextPage } from "next";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { Layout } from "../../../components/Layout";
 import { trpc } from "../../../utils/trpc";
 import { QuestionView } from "../../../components/QuestionsView";
@@ -7,23 +7,56 @@ import { useRouter } from "next/router";
 import { Subject } from "@prisma/client";
 import { useEffect } from "react";
 import { useLoading } from "../../../hooks";
+import { createSSGHelpers } from "@trpc/react/ssg";
+import { appRouter } from "../../../server/router";
+import { createContext } from "../../../server/router/context";
+import superjson from "superjson";
 
-interface SubjectViewProps {
-    // subject: string;
-    // questions: Question[] | null;
+export async function getStaticProps(
+    context: GetStaticPropsContext<{ subject: Subject }>
+) {
+    const ssg = await createSSGHelpers({
+        router: appRouter,
+        ctx: await createContext(),
+        transformer: superjson, // optional - adds superjson serialization
+    });
+
+    await ssg.fetchQuery("questions.getBySubject", {
+        subject: context.params?.subject as Subject,
+    });
+
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+        },
+        revalidate: 1,
+    };
 }
 
-const SubjectView: NextPage<SubjectViewProps> = (props) => {
+export async function getStaticPaths() {
+    const questions = await prisma?.question.findMany({
+        select: {
+            subject: true,
+        },
+    });
+
+    return {
+        paths: questions?.map((question) => ({
+            params: {
+                subject: question.subject,
+            },
+        })),
+        fallback: "blocking",
+    };
+}
+
+const SubjectView = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
     const router = useRouter();
     const questions = trpc.useQuery([
         "questions.getBySubject",
         { subject: router.query.subject as Subject },
     ]);
     const { setLoading } = useLoading();
-
-    useEffect(() => {
-        setLoading(questions.isLoading);
-    }, [questions, setLoading]);
 
     return (
         <Layout>
