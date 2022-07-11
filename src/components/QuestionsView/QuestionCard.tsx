@@ -36,7 +36,7 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                     Votes: {props.question.votesCount}
                 </Text>
                 <Text className={"text-xs font-semibold"}>Views: N/A</Text>
-                <Text className={"text-xs font-semibold"}>Answers: N/A</Text>
+                <Text className={"text-xs font-semibold"}>Answers: {props.question.answersCount}</Text>
             </div>
             <div
                 className={
