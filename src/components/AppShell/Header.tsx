@@ -17,12 +17,12 @@ export default function Header(props: HeaderProps) {
     return (
         <div
             className={
-                "z-30 h-16 flex items-center w-full fixed inset-0 z-10 bg-gray-50 shadow-md"
+                "px-4 z-30 h-16 flex items-center w-full fixed inset-0 z-10 bg-gray-50 shadow-md"
             }
         >
             <div
                 className={
-                    "w-16 h-full flex justify-center items-center sm:hidden" +
+                    "h-full flex justify-center items-center sm:hidden" +
                     (props.hideSidebarBurger === true ? " hidden" : "")
                 }
                 onClick={props.onHamburgerClick}
@@ -34,14 +34,14 @@ export default function Header(props: HeaderProps) {
             </div>
             <div
                 className={
-                    "h-full flex justify-center items-center cursor-pointer"
+                    "mx-4 h-5/6 flex justify-center items-center cursor-pointer"
                 }
                 onClick={() => router.push("/")}
             >
                 <img
                     src={"/images/logos/logo.png"}
                     className={
-                        "h-5/6 sm:hidden" +
+                        "h-full object-cover sm:hidden" +
                         (props.hideSidebarBurger === true ? " pl-4" : "")
                     }
                 />
@@ -52,7 +52,7 @@ export default function Header(props: HeaderProps) {
             </div>
             <div
                 className={
-                    "w-16 h-full ml-auto flex justify-center items-center sm:hidden"
+                    "w-16 h-full ml-auto flex justify-center items-center sm:hidden hidden"
                 }
             >
                 <Icon
