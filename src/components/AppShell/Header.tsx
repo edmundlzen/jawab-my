@@ -70,9 +70,21 @@ export default function Header(props: HeaderProps) {
                 </Button>
             ) : (
                 <div
-                    className={"ml-auto mr-4 flex justify-center items-center"}
+                    className={
+                        "h-full ml-auto mr-4 flex justify-center items-center"
+                    }
                 >
-                    Logged in as {session?.user?.name}
+                    <div
+                        className="h-full flex justify-center items-center px-6 bg-white hover:bg-gray-300 transition-all cursor-pointer select-none"
+                        onClick={() => router.push("/profile")}
+                    >
+                        <img
+                            src={
+                                session!.user!.image ? session!.user!.image : ""
+                            }
+                            className={"h-4/6 object-cover rounded"}
+                        />
+                    </div>
                 </div>
             )}
         </div>
