@@ -10,7 +10,7 @@ export const answersRouter = createRouter()
         }),
         async resolve({ ctx, input }) {
             const answers = await ctx.prisma.answer.findMany({
-                include: { votes: true, user: true },
+                include: { votes: true, user: true, comments: { include: { user: true } } },
             });
             return answers.map((answer) => ({
                 ...answer,

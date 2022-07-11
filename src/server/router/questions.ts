@@ -48,6 +48,7 @@ export const questionsRouter = createRouter()
                     tags: true,
                     user: true,
                     answers: { include: { votes: true, user: true } },
+                    comments: { include: { user: true } },
                 },
             });
             if (!question) {
