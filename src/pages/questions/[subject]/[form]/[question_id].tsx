@@ -1,4 +1,10 @@
-import { NextPage, NextPageContext } from "next";
+import {
+    NextPage,
+    NextPageContext,
+    GetStaticPaths,
+    GetStaticPropsContext,
+    InferGetStaticPropsType,
+} from "next";
 import { Layout } from "../../../../components/Layout";
 import { useRouter } from "next/router";
 import { Button, InputWrapper, Text } from "@mantine/core";
@@ -13,21 +19,64 @@ import { InferQueryOutput, trpc } from "../../../../utils/trpc";
 import { useSession } from "next-auth/react";
 import { Editor } from "@mantine/rte";
 import moment from "moment";
+import superjson from "superjson";
+import { createSSGHelpers } from "@trpc/react/ssg";
+import { appRouter } from "../../../../server/router";
+import { createContext } from "../../../../server/router/context";
 
-// type QuestionsOutput = InferQueryOutput<"questions.getAll">;
+export async function getStaticProps(
+    context: GetStaticPropsContext<{ question_id: string }>
+) {
+    const ssg = await createSSGHelpers({
+        router: appRouter,
+        ctx: await createContext(),
+        transformer: superjson, // optional - adds superjson serialization
+    });
+    const questionId = context.params?.question_id as string;
 
-type QuestionViewProps = {
-    // question: QuestionsOutput[0];
-};
+    // prefetch `post.byId`
+    await ssg.fetchQuery("questions.getById", {
+        questionId,
+    });
 
-const QuestionView: NextPage<QuestionViewProps> = (props) => {
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+            questionId,
+        },
+        revalidate: 1,
+    };
+}
+
+export async function getStaticPaths() {
+    const questions = await prisma?.question.findMany({
+        select: {
+            id: true,
+            subject: true,
+            form: true,
+        },
+    });
+
+    return {
+        paths: questions?.map((question) => ({
+            params: {
+                question_id: question.id,
+                subject: question.subject,
+                form: question.form,
+            },
+        })),
+        fallback: "blocking",
+    };
+}
+
+const QuestionView = (
+    props: InferGetStaticPropsType<typeof getStaticProps>
+) => {
     const router = useRouter();
+    const { questionId } = props;
     const [answerContent, setAnswerContent] = useState("");
     const { loading, setLoading } = useLoading();
-    const questionPost = trpc.useQuery([
-        "questions.getById",
-        { questionId: router.query.question_id as string },
-    ]);
+    const questionPost = trpc.useQuery(["questions.getById", { questionId }]);
     const createAnswer = trpc.useMutation(["answers.create"]);
     const { data: session, status } = useSession();
     const utils = trpc.useContext();
