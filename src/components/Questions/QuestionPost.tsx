@@ -173,6 +173,7 @@ const QuestionPost = (props: QuestionPostProps) => {
                                 border: "none",
                             },
                         }}
+                        editorRef={null}
                     />
                     <div
                         className={"pl-4 flex gap-x-2 gap-y-1 flex-1 flex-wrap"}

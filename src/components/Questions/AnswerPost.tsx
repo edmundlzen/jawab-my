@@ -160,6 +160,7 @@ const AnswerPost = (props: AnswerProps) => {
                                 border: "none",
                             },
                         }}
+                        editorRef={null}
                     />
                     <div className={"flex mt-8 justify-end"}>
                         <div className={"bg-slate-200 p-3 rounded"}>
