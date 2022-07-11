@@ -61,15 +61,13 @@ export default function Header(props: HeaderProps) {
                 />
             </div>
             {status !== "authenticated" ? (
-                router.pathname !== "/auth/login" && (
-                    <Button
-                        className={"mr-5 sm:ml-auto bg-red-400"}
-                        color={"red"}
-                        onClick={() => router.push("/api/auth/signin")}
-                    >
-                        <Text>Login</Text>
-                    </Button>
-                )
+                <Button
+                    className={"mr-5 sm:ml-auto bg-red-400"}
+                    color={"red"}
+                    onClick={() => router.push("/api/auth/signin")}
+                >
+                    <Text>Login</Text>
+                </Button>
             ) : (
                 <div
                     className={"ml-auto mr-4 flex justify-center items-center"}
