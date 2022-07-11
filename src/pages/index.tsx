@@ -1,19 +1,34 @@
-import type { NextPage } from "next";
+import type { GetStaticPropsContext, NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { Layout } from "../components/Layout";
 import { QuestionView } from "../components/QuestionsView";
 import { useEffect } from "react";
 import { useLoading } from "../hooks";
+import { createSSGHelpers } from "@trpc/react/ssg";
+import { appRouter } from "../server/router";
+import superjson from "superjson";
+import { createContext } from "../server/router/context";
+
+export async function getStaticProps(context: GetStaticPropsContext<{}>) {
+    const ssg = await createSSGHelpers({
+        router: appRouter,
+        ctx: await createContext(),
+        transformer: superjson, // optional - adds superjson serialization
+    });
+
+    await ssg.fetchQuery("questions.getAll");
+
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+        },
+        revalidate: 1,
+    };
+}
 
 const Home: NextPage = () => {
     const questions = trpc.useQuery(["questions.getAll"]);
-    const { setLoading } = useLoading();
-
-    useEffect(() => {
-        if (!setLoading) return;
-        setLoading(questions.isLoading);
-    }, [questions, setLoading]);
 
     return (
         <Layout>
