@@ -106,6 +106,25 @@ export const questionsRouter = createRouter()
             });
         },
     })
+    .mutation("delete", {
+        input: z.object({
+            questionId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: input.questionId },
+            });
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            if (question.userId !== ctx.session!.userId) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+            return ctx.prisma.question.delete({
+                where: { id: input.questionId },
+            });
+        },
+    })
     .mutation("vote", {
         input: z.object({
             questionId: z.string().min(1).max(100),
