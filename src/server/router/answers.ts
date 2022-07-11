@@ -10,7 +10,11 @@ export const answersRouter = createRouter()
         }),
         async resolve({ ctx, input }) {
             const answers = await ctx.prisma.answer.findMany({
-                include: { votes: true, user: true, comments: { include: { user: true } } },
+                include: {
+                    votes: true,
+                    user: true,
+                    comments: { include: { user: true } },
+                },
             });
             return answers.map((answer) => ({
                 ...answer,
@@ -48,6 +52,21 @@ export const answersRouter = createRouter()
                     }
                 }
             }
+        },
+    })
+    .mutation("createComment", {
+        input: z.object({
+            answerId: z.string(),
+            content: z.string().min(1).max(1000),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.answerComment.create({
+                data: {
+                    answerId: input.answerId,
+                    content: input.content,
+                    userId: ctx.session!.userId as string,
+                },
+            });
         },
     })
     .mutation("delete", {

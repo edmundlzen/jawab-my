@@ -107,6 +107,21 @@ export const questionsRouter = createRouter()
             });
         },
     })
+    .mutation("createComment", {
+        input: z.object({
+            questionId: z.string(),
+            content: z.string().min(1).max(1000),
+        }),
+        async resolve({ ctx, input }) {
+            return await ctx.prisma.questionComment.create({
+                data: {
+                    questionId: input.questionId,
+                    content: input.content,
+                    userId: ctx.session!.userId as string,
+                },
+            });
+        },
+    })
     .mutation("delete", {
         input: z.object({
             questionId: z.string(),
