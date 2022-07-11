@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import { InferQueryOutput } from "../../utils/trpc";
 import { VoteType } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
+import CommentsSection from "./CommentsSection";
 
 type QuestionOutput = InferQueryOutput<"questions.getById">;
 
@@ -88,33 +89,6 @@ const QuestionPost = (props: QuestionPostProps) => {
             setLoading(false);
         }
     };
-
-    // const handleCommentSubmit = async (comment: string) => {
-    // 	setLoading(true)
-    // 	try {
-    // 		const accessToken = await getToken({'hasura'});
-    // 		if (!accessToken) return;
-    // 		await api(accessToken)?.({
-    // 			method: 'post',
-    // 			url: '/comments',
-    // 			data: {
-    // 				questionId: router.query.question_id,
-    // 				content: comment,
-    // 			}
-    // 		});
-    // 		showNotification({
-    // 			title: 'Comment added',
-    // 			message: 'Your comment has been added',
-    // 		})
-    // 		router.reload();
-    // 	} catch (e) {
-    // 		showNotification({
-    // 			title: 'Error',
-    // 			message: 'Something went wrong',
-    // 		})
-    // 		setLoading(false)
-    // 	}
-    // }
 
     const handleDeletePostButtonClick = () => {
         modals.openConfirmModal({
@@ -260,10 +234,11 @@ const QuestionPost = (props: QuestionPostProps) => {
                 <div className={"flex items-center mb-2"}>
                     <Text className={"text-lg font-semibold"}>Comments</Text>
                 </div>
-                {/* <CommentsSection
+                <CommentsSection
                     comments={props.question.comments}
-                    onCommentSubmit={handleCommentSubmit}
-                /> */}
+                    commentsSectionType="question"
+                    propertyId={props.question.id}
+                />
             </div>
         </div>
     );

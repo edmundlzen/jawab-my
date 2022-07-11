@@ -10,6 +10,7 @@ import { InferQueryOutput } from "../../utils/trpc";
 import { useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
 import { VoteType } from "@prisma/client";
+import CommentsSection from "./CommentsSection";
 
 type QuestionsGetByIdOutput = InferQueryOutput<"questions.getById">;
 
@@ -218,10 +219,11 @@ const AnswerPost = (props: AnswerProps) => {
                 <div className={"flex items-center mb-2"}>
                     <Text className={"text-lg font-semibold"}>Comments</Text>
                 </div>
-                {/* <CommentsSection
+                <CommentsSection
                     comments={props.answer.comments}
-                    onCommentSubmit={handleCommentSubmit}
-                /> */}
+                    propertyId={props.answer.id}
+                    commentsSectionType="answer"
+                />
             </div>
             <Divider className={"mt-8"} />
         </div>
