@@ -31,7 +31,7 @@ const QuestionView = (props: QuestionViewProps) => {
                     className={"bg-teal-400 mr-4"}
                     color={"teal"}
                     onClick={async () => {
-                        if (status === "authenticated") {
+                        if (status !== "authenticated") {
                             showNotification({
                                 title: "Please log in",
                                 message:
