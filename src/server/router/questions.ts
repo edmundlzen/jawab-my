@@ -122,6 +122,27 @@ export const questionsRouter = createRouter()
             });
         },
     })
+    .mutation("deleteComment", {
+        input: z.object({
+            commentId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const comment = await ctx.prisma.questionComment.findUnique({
+                where: {
+                    id: input.commentId,
+                },
+            });
+            if (!comment) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            if (comment.userId !== ctx.session!.userId) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+            return ctx.prisma.questionComment.delete({
+                where: { id: input.commentId },
+            });
+        },
+    })
     .mutation("delete", {
         input: z.object({
             questionId: z.string(),
