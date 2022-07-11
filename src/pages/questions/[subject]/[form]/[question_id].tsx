@@ -5,14 +5,15 @@ import { Button, InputWrapper, Text } from "@mantine/core";
 import { Divider } from "@mantine/core";
 import { QuestionPost, AnswerPost } from "../../../../components/Questions";
 import { RichTextEditor } from "../../../../components/RichTextEditor";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import sanitizeHtml from "sanitize-html";
 import { useLoading } from "../../../../hooks";
 import { InferQueryOutput, trpc } from "../../../../utils/trpc";
 import { useSession } from "next-auth/react";
+import { Editor } from "@mantine/rte";
 
-type QuestionsOutput = InferQueryOutput<"questions.getAll">;
+// type QuestionsOutput = InferQueryOutput<"questions.getAll">;
 
 type QuestionViewProps = {
     // question: QuestionsOutput[0];
@@ -29,6 +30,7 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
     const createAnswer = trpc.useMutation(["answers.create"]);
     const { data: session, status } = useSession();
     const utils = trpc.useContext();
+    const editorRef = useRef<Editor>(null);
 
     const handleAnswerSubmitButton = async () => {
         if (
@@ -64,7 +66,7 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
                 message: "Your answer has been submitted successfully",
             });
             utils.invalidateQueries(["questions.getById"]);
-            setAnswerContent("");
+            editorRef.current?.editor?.clipboard.dangerouslyPasteHTML("");
             setLoading(false);
         } catch (e) {
             console.error(e);
@@ -172,6 +174,7 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
                                     className={"min-h-[40vh]"}
                                     value={answerContent}
                                     onChange={setAnswerContent}
+                                    editorRef={editorRef}
                                     // controls={[
                                     // ['bold', 'italic', 'underline', 'link', 'image'],
                                     // ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
