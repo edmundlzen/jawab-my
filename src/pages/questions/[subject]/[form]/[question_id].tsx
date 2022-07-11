@@ -43,6 +43,16 @@ const QuestionView: NextPage<QuestionViewProps> = (props) => {
             });
             return;
         }
+        for (const answer of questionPost.data?.answers || []) {
+            if (answer.userId === session?.userId) {
+                showNotification({
+                    title: "Error",
+                    message: "You have already answered this question",
+                });
+                return;
+            }
+        }
+
         try {
             setLoading(true);
             await createAnswer.mutateAsync({
