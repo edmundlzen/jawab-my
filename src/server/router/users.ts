@@ -16,7 +16,7 @@ export const usersRouter = createRouter()
     })
     .query("getMe", {
         async resolve({ ctx }) {
-            return await ctx.prisma.user.findUnique({
+            const question = await ctx.prisma.user.findUnique({
                 where: { id: ctx.session!.userId as string },
                 include: {
                     questions: true,
@@ -25,5 +25,9 @@ export const usersRouter = createRouter()
                     questionComments: true,
                 },
             });
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            return question;
         },
     });
