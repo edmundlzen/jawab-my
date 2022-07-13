@@ -174,7 +174,12 @@ const QuestionView = (
                     <QuestionPost question={questionPost.data} />
                 </div>
                 {/* end of question */}
-                <Divider className={"my-5"} />
+                {questionPost.data.answers.length > 0 && (
+                    <div className="text-3xl font-semibold pt-6">
+                        {questionPost.data.answers.length} Answers
+                    </div>
+                )}
+                <Divider className={"mt-5"} />
                 <div>
                     <div>
                         {questionPost.data.answers &&
@@ -184,64 +189,71 @@ const QuestionView = (
                                 );
                             })}
                     </div>
-                    <Text className={"font-semibold text-2xl sm:text-3xl my-4"}>
-                        Submit an answer
-                    </Text>
-                    <div className={"relative"}>
-                        {status !== "authenticated" && (
-                            <div
-                                className={
-                                    "absolute inset-0 flex flex-col justify-center items-center z-20"
-                                }
-                            >
-                                <Text className={"text-lg font-semibold"}>
-                                    You must be logged in to submit an answer
-                                </Text>
-                                <Button
-                                    className={"bg-red-400 mt-4"}
-                                    color={"red"}
-                                    onClick={() =>
-                                        router.push("/api/auth/signin")
-                                    }
-                                >
-                                    Login
-                                </Button>
-                            </div>
-                        )}
-                        <div
+                    <div className="bg-gray-100 border p-4 rounded-md">
+                        <Text
                             className={
-                                status !== "authenticated" ? "blur-sm" : ""
+                                "font-semibold text-2xl sm:text-3xl my-4"
                             }
                         >
-                            <InputWrapper
-                                id="answer-content"
-                                required
-                                label="Answer"
-                                description="Please ensure your answer is clear and concise."
+                            Submit an answer
+                        </Text>
+                        <div className={"relative"}>
+                            {status !== "authenticated" && (
+                                <div
+                                    className={
+                                        "absolute inset-0 flex flex-col justify-center items-center z-20"
+                                    }
+                                >
+                                    <Text className={"text-lg font-semibold"}>
+                                        You must be logged in to submit an
+                                        answer
+                                    </Text>
+                                    <Button
+                                        className={"bg-red-400 mt-4"}
+                                        color={"red"}
+                                        onClick={() =>
+                                            router.push("/api/auth/signin")
+                                        }
+                                    >
+                                        Login
+                                    </Button>
+                                </div>
+                            )}
+                            <div
+                                className={
+                                    status !== "authenticated" ? "blur-sm" : ""
+                                }
                             >
-                                <RichTextEditor
+                                <InputWrapper
                                     id="answer-content"
-                                    className={"min-h-[40vh]"}
-                                    value={answerContent}
-                                    onChange={setAnswerContent}
-                                    editorRef={editorRef}
-                                    // controls={[
-                                    // ['bold', 'italic', 'underline', 'link', 'image'],
-                                    // ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                                    // ['unorderedList', 'orderedList'],
-                                    // ['alignLeft', 'alignCenter', 'alignRight'],
-                                    // ['sup', 'sub'],
-                                    // ]}
-                                />
-                            </InputWrapper>
-                            <Button
-                                className={"mt-5 bg-blue-500"}
-                                onClick={() => {
-                                    handleAnswerSubmitButton();
-                                }}
-                            >
-                                Submit
-                            </Button>
+                                    required
+                                    label="Answer"
+                                    description="Please ensure your answer is clear and concise."
+                                >
+                                    <RichTextEditor
+                                        id="answer-content"
+                                        className={"min-h-[40vh]"}
+                                        value={answerContent}
+                                        onChange={setAnswerContent}
+                                        editorRef={editorRef}
+                                        // controls={[
+                                        // ['bold', 'italic', 'underline', 'link', 'image'],
+                                        // ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+                                        // ['unorderedList', 'orderedList'],
+                                        // ['alignLeft', 'alignCenter', 'alignRight'],
+                                        // ['sup', 'sub'],
+                                        // ]}
+                                    />
+                                </InputWrapper>
+                                <Button
+                                    className={"mt-5 bg-blue-500"}
+                                    onClick={() => {
+                                        handleAnswerSubmitButton();
+                                    }}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
