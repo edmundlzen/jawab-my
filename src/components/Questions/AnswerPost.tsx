@@ -113,7 +113,7 @@ const AnswerPost = (props: AnswerProps) => {
     };
 
     return (
-        <div>
+        <div className="border-b py-4 last:border-b-0">
             <div className={"flex"}>
                 <div
                     className={
@@ -215,7 +215,6 @@ const AnswerPost = (props: AnswerProps) => {
                     commentsSectionType="answer"
                 />
             </div>
-            <Divider className={"mt-8"} />
         </div>
     );
 };
