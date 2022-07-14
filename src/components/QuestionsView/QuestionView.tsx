@@ -19,7 +19,7 @@ const QuestionView = (props: QuestionViewProps) => {
 
     return (
         <div className={"h-full flex flex-col"}>
-            <div className={"flex justify-between pt-5"}>
+            <div className={"flex justify-between py-5 border-b"}>
                 <Text
                     className={
                         "pl-6 text-xl sm:text-3xl font-semibold capitalize"
@@ -45,7 +45,7 @@ const QuestionView = (props: QuestionViewProps) => {
                     <Text className={"text-sm"}>Ask question</Text>
                 </Button>
             </div>
-            <div className={"flex-1 flex pt-6 flex-col"}>
+            <div className={"flex-1 flex flex-col"}>
                 {questions.length === 0 && (
                     <div className={"flex-1 flex justify-center items-center"}>
                         <img

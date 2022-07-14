@@ -23,7 +23,7 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
     return (
         <div
             className={
-                "flex flex-col sm:flex-row min-h-32 w-full border-b last:border-b-0 first:border-t border-gray-300 pt-3 sm:pt-5 p-5 cursor-pointer group"
+                "flex flex-col sm:flex-row min-h-32 w-full border-b border-gray-300 pt-3 sm:pt-5 p-5 cursor-pointer group"
             }
             onClick={() => {
                 router.push(
@@ -36,7 +36,9 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                     Votes: {props.question.votesCount}
                 </Text>
                 <Text className={"text-xs font-semibold"}>Views: N/A</Text>
-                <Text className={"text-xs font-semibold"}>Answers: {props.question.answersCount}</Text>
+                <Text className={"text-xs font-semibold"}>
+                    Answers: {props.question.answersCount}
+                </Text>
             </div>
             <div
                 className={
