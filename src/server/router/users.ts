@@ -16,18 +16,49 @@ export const usersRouter = createRouter()
     })
     .query("getMe", {
         async resolve({ ctx }) {
-            const question = await ctx.prisma.user.findUnique({
+            const user = await ctx.prisma.user.findUnique({
                 where: { id: ctx.session!.userId as string },
                 include: {
-                    questions: true,
-                    answers: true,
+                    questions: {
+                        include: {
+                            tags: true,
+                            user: true,
+                            votes: true,
+                            _count: {
+                                select: {
+                                    answers: true,
+                                },
+                            },
+                        },
+                    },
+                    answers: {
+                        include: {
+                            user: true,
+                            comments: { include: { user: true } },
+                            votes: true,
+                        },
+                    },
                     answerComments: true,
                     questionComments: true,
                 },
             });
-            if (!question) {
+            if (!user) {
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
-            return question;
+            return {
+                ...user,
+                questions: user.questions.map((question) => ({
+                    ...question,
+                    votesCount: question.votes.reduce((acc, vote) => {
+                        return acc + (vote.voteType === VoteType.up ? 1 : -1);
+                    }, 0),
+                })),
+                answers: user.answers.map((answer) => ({
+                    ...answer,
+                    votesCount: answer.votes.reduce((acc, vote) => {
+                        return acc + (vote.voteType === VoteType.up ? 1 : -1);
+                    }, 0),
+                })),
+            };
         },
     });
