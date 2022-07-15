@@ -35,7 +35,7 @@ export const questionsRouter = createRouter()
                     votes: true,
                     tags: true,
                     user: true,
-                    _count: { select: { answers: true } },
+                    _count: { select: { answers: true, views: true } },
                 },
             });
             return questions.map((question) => ({
