@@ -13,7 +13,7 @@ export const questionsRouter = createRouter()
                     votes: true,
                     tags: true,
                     user: true,
-                    _count: { select: { answers: true } },
+                    _count: { select: { answers: true, views: true } },
                 },
             });
             return questions.map((question) => ({
@@ -65,6 +65,7 @@ export const questionsRouter = createRouter()
                         },
                     },
                     comments: { include: { user: true } },
+                    _count: { select: { views: true } },
                 },
             });
             if (!question) {
@@ -231,5 +232,26 @@ export const questionsRouter = createRouter()
                     },
                 });
             }
+        },
+    })
+    .mutation("view", {
+        input: z.object({
+            questionId: z.string(),
+        }),
+        async resolve({ ctx, input }) {
+            const { questionId } = input;
+            const userId = ctx.session!.userId as string;
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: questionId },
+            });
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            await ctx.prisma.questionView.create({
+                data: {
+                    questionId,
+                    userId,
+                },
+            });
         },
     });
