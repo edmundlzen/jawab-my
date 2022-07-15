@@ -53,6 +53,7 @@ model User {
   answers          Answer[]
   answerVotes      AnswerVote[]
   answerComments   AnswerComment[]
+  viewedQuestions  QuestionView[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
 }
@@ -105,6 +106,7 @@ model Question {
   votes     QuestionVote[]
   answers   Answer[]
   comments  QuestionComment[]
+  views     QuestionView[]
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @default(now())
@@ -175,4 +177,16 @@ model AnswerComment {
   answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model QuestionView {
+  id        String   @id @default(cuid())
+  questionId String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question  Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([userId, questionId])
 }
