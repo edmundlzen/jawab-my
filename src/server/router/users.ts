@@ -27,6 +27,7 @@ export const usersRouter = createRouter()
                             _count: {
                                 select: {
                                     answers: true,
+                                    views: true
                                 },
                             },
                         },
