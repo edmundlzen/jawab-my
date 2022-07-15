@@ -11,7 +11,7 @@ import { Button, InputWrapper, Text } from "@mantine/core";
 import { Divider } from "@mantine/core";
 import { Post } from "../../../../components/Questions";
 import { RichTextEditor } from "../../../../components/RichTextEditor";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import sanitizeHtml from "sanitize-html";
 import { useLoading } from "../../../../hooks";
@@ -78,9 +78,16 @@ const QuestionView = (
     const { loading, setLoading } = useLoading();
     const questionPost = trpc.useQuery(["questions.getById", { questionId }]);
     const createAnswer = trpc.useMutation(["answers.create"]);
+    const createView = trpc.useMutation(["questions.view"]);
     const { data: session, status } = useSession();
     const utils = trpc.useContext();
     const editorRef = useRef<Editor>(null);
+
+    useEffect(() => {
+        createView.mutate({
+            questionId,
+        });
+    }, [questionId]);
 
     const handleAnswerSubmitButton = async () => {
         if (
@@ -168,7 +175,9 @@ const QuestionView = (
                         </Text>
                         <Text className={"text-xs"}>
                             Viewed{" "}
-                            <span className={"font-semibold"}>N/A times</span>
+                            <span className={"font-semibold"}>
+                                {questionPost.data._count.views} times
+                            </span>
                         </Text>
                     </div>
                     <Post question={questionPost.data} />

@@ -35,7 +35,9 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                 <Text className={"text-xs font-bold"}>
                     Votes: {props.question.votesCount}
                 </Text>
-                <Text className={"text-xs font-semibold"}>Views: N/A</Text>
+                <Text className={"text-xs font-semibold"}>
+                    Views: {props.question._count.views}
+                </Text>
                 <Text className={"text-xs font-semibold"}>
                     Answers: {props.question._count.answers}
                 </Text>
