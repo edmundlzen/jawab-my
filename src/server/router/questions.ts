@@ -85,6 +85,23 @@ export const questionsRouter = createRouter()
             };
         },
     })
+    .query("getAllCountBySubject", {
+        async resolve({ ctx }) {
+            const questions = await ctx.prisma.question.findMany({
+                select: { subject: true },
+            });
+            let subjectsToQuestions: { [key: string]: number } = {};
+            for (const subject of Object.values(Subject)) {
+                subjectsToQuestions[subject] = 0;
+                for (const question of questions) {
+                    if (question.subject === subject) {
+                        subjectsToQuestions[subject]++;
+                    }
+                }
+            }
+            return subjectsToQuestions;
+        },
+    })
     .middleware(async ({ ctx, next }) => {
         // Any queries or mutations after this middleware will
         // raise an error unless there is a current session
