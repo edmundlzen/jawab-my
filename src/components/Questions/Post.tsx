@@ -16,32 +16,54 @@ import CommentsSection from "./CommentsSection";
 
 type QuestionOutput = InferQueryOutput<"questions.getById">;
 
-type QuestionPostProps = {
-    question: QuestionOutput;
-};
+interface CommonPostProps {}
 
-const QuestionPost = (props: QuestionPostProps) => {
+type ConditionalPostProps =
+    | {
+          answer?: QuestionOutput["answers"][0];
+          question?: never;
+      }
+    | {
+          answer?: never;
+          question: QuestionOutput;
+      };
+
+type PostProps = CommonPostProps & ConditionalPostProps;
+
+const Post = (props: PostProps) => {
     const [voteType, setVoteType] = useState<"up" | "down" | null>(null);
     const { loading, setLoading } = useLoading();
     const { data: session, status } = useSession();
     const questionsVote = trpc.useMutation(["questions.vote"]);
-    const deleteQuestion = trpc.useMutation(["questions.delete"]);
+    const questionsDelete = trpc.useMutation(["questions.delete"]);
+    const answersVote = trpc.useMutation(["answers.vote"]);
+    const answersDelete = trpc.useMutation(["answers.delete"]);
     const utils = trpc.useContext();
     const router = useRouter();
     const modals = useModals();
+    const postType = props.answer ? "answer" : "question";
+    const { answer, question } = props;
+    const post =
+        (answer as QuestionOutput["answers"][0]) ||
+        (question as QuestionOutput);
+    const [votes, setVotes] = useState(post.votesCount);
 
     useEffect(() => {
         if (status === "authenticated") {
             setLoading(true);
-            // Check if user has voted for this question
-            props.question.votes.forEach((vote) => {
+            // Check if user has voted for this post
+            post.votes.forEach((vote) => {
                 if (vote.userId === session.userId) {
                     setVoteType(vote.voteType);
                 }
             });
             setLoading(false);
         }
-    }, [props.question, session, status, setLoading]);
+    }, [post.votes, session, status, setLoading]);
+
+    useEffect(() => {
+        setVotes(post.votesCount);
+    }, [post.votesCount]);
 
     const handleVoteButtonClick = async (voteButtonClickType: VoteType) => {
         if (status !== "authenticated") {
@@ -53,41 +75,77 @@ const QuestionPost = (props: QuestionPostProps) => {
         }
         setLoading(true);
         if (voteButtonClickType === voteType) {
-            // Unvote
-            setVoteType(null);
             try {
-                await questionsVote.mutateAsync({
-                    questionId: props.question.id,
-                    voteType: VoteType.up,
-                    remove: true,
-                });
+                switch (postType) {
+                    case "answer":
+                        // Unvote
+                        await answersVote.mutateAsync({
+                            answerId: post.id,
+                            voteType: VoteType.up,
+                            remove: true,
+                        });
+                        break;
+                    case "question":
+                        // Unvote
+                        await questionsVote.mutateAsync({
+                            questionId: post.id,
+                            voteType: VoteType.up,
+                            remove: true,
+                        });
+                        break;
+                }
+                setVoteType(null);
+                setVotes(
+                    voteButtonClickType === VoteType.up ? votes - 1 : votes + 1
+                );
                 utils.invalidateQueries(["questions.getById"]);
             } catch (e: any) {
                 showNotification({
                     title: "Error",
                     message: e,
                 });
-                setVoteType(voteType);
             }
         } else {
-            // Vote
-            setVoteType(voteButtonClickType);
             try {
-                await questionsVote.mutateAsync({
-                    questionId: props.question.id,
-                    voteType: voteButtonClickType,
-                    remove: false,
-                });
+                switch (postType) {
+                    case "answer":
+                        await answersVote.mutateAsync({
+                            answerId: post.id,
+                            voteType: voteButtonClickType,
+                            remove: false,
+                        });
+                        break;
+                    case "question":
+                        await questionsVote.mutateAsync({
+                            questionId: post.id,
+                            voteType: voteButtonClickType,
+                            remove: false,
+                        });
+                        break;
+                }
+                setVoteType(voteButtonClickType);
+                if (voteType === null) {
+                    setVotes(
+                        voteButtonClickType === VoteType.up
+                            ? votes + 1
+                            : votes - 1
+                    );
+                } else {
+                    setVotes(
+                        voteButtonClickType === VoteType.up
+                            ? votes + 2
+                            : votes - 2
+                    );
+                }
                 utils.invalidateQueries(["questions.getById"]);
             } catch (e: any) {
                 showNotification({
                     title: "Error",
                     message: e,
                 });
-                setVoteType(voteType);
             }
-            setLoading(false);
         }
+        setLoading(false);
     };
 
     const handleDeletePostButtonClick = () => {
@@ -107,17 +165,25 @@ const QuestionPost = (props: QuestionPostProps) => {
             onConfirm: async () => {
                 setLoading(true);
                 try {
-                    await deleteQuestion.mutateAsync({
-                        questionId: props.question.id,
-                    });
+                    switch (postType) {
+                        case "answer":
+                            await answersDelete.mutateAsync({
+                                answerId: post.id,
+                            });
+                            break;
+                        case "question":
+                            await questionsDelete.mutateAsync({
+                                questionId: post.id,
+                            });
+                            break;
+                    }
                     showNotification({
                         title: "Question deleted",
                         message: "Your question has been deleted",
                     });
-                    utils.invalidateQueries(["questions.getById"]);
+                    utils.invalidateQueries(["questions.getAll"]);
                     router.back();
-                    return;
-                } catch (e) {
+                } catch (e: any) {
                     showNotification({
                         title: "Error",
                         message: "Something went wrong",
@@ -130,7 +196,7 @@ const QuestionPost = (props: QuestionPostProps) => {
     };
 
     return (
-        <div className={""}>
+        <div className={"border-b py-4 last:border-b-0"}>
             <div className={"flex"}>
                 <div className={"pt-3 flex flex-col w-auto pr-3 items-center"}>
                     <div
@@ -140,15 +206,13 @@ const QuestionPost = (props: QuestionPostProps) => {
                         <Icon
                             icon={"bi:arrow-up-circle-fill"}
                             className={
-                                "text-3xl group-hover:text-red-800 transition-all duration-75" +
+                                "text-3xl transition-all duration-75" +
                                 (voteType === "up" ? " text-red-600" : "")
                             }
                         />
                     </div>
                     <div className={"flex justify-center items-center my-4"}>
-                        <Text className={"text-xl"}>
-                            {props.question.votesCount}
-                        </Text>
+                        <Text className={"text-xl"}>{votes}</Text>
                     </div>
                     <div
                         className={"flex justify-center items-center group"}
@@ -166,7 +230,7 @@ const QuestionPost = (props: QuestionPostProps) => {
                 <div className={"flex-1"}>
                     <RichTextEditor
                         readOnly
-                        value={props.question.content}
+                        value={post.content}
                         onChange={() => {}}
                         styles={{
                             root: {
@@ -175,39 +239,44 @@ const QuestionPost = (props: QuestionPostProps) => {
                         }}
                         editorRef={null}
                     />
-                    <div
-                        className={"pl-4 flex gap-x-2 gap-y-1 flex-1 flex-wrap"}
-                    >
-                        <Badge color="gray">
-                            {props.question.subject.replace("_", " ")}
-                        </Badge>
-                        <Badge color="gray">Form {props.question.form}</Badge>
-                        {props.question.tags.length !== 0
-                            ? props.question.tags.map((tag, index) => {
-                                  return (
-                                      <Badge key={index} color={""}>
-                                          {tag.name}
-                                      </Badge>
-                                  );
-                              })
-                            : null}
-                    </div>
+                    {question && (
+                        <div
+                            className={
+                                "pl-4 flex gap-x-2 gap-y-1 flex-1 flex-wrap"
+                            }
+                        >
+                            <Badge color="gray">
+                                {question.subject.replace("_", " ")}
+                            </Badge>
+                            <Badge color="gray">Form {question.form}</Badge>
+                            {question.tags.length !== 0
+                                ? question.tags.map((tag, index) => {
+                                      return (
+                                          <Badge key={index} color={""}>
+                                              {tag.name}
+                                          </Badge>
+                                      );
+                                  })
+                                : null}
+                        </div>
+                    )}
+
                     <div className={"flex mt-8 justify-end"}>
                         <div className={"bg-slate-200 p-3 rounded"}>
                             <img
                                 className={"rounded-md h-8 w-8 mb-2"}
-                                src={props.question.user.image as string}
+                                src={post.user.image as string}
                                 referrerPolicy={"no-referrer"}
                                 alt={"avatar"}
                             />
                             <Text className={"text-xs"}>
                                 Asked by{" "}
                                 <span className={"font-semibold"}>
-                                    {props.question.user.name}
+                                    {post.user.name}
                                 </span>
                             </Text>
                             <div className={"flex mt-2"}>
-                                {props.question.user.id === session?.userId && (
+                                {post.user.id === session?.userId && (
                                     <div
                                         className={
                                             "cursor-pointer select-none group"
@@ -236,13 +305,13 @@ const QuestionPost = (props: QuestionPostProps) => {
                     <Text className={"text-lg font-semibold"}>Comments</Text>
                 </div>
                 <CommentsSection
-                    comments={props.question.comments}
-                    commentsSectionType="question"
-                    propertyId={props.question.id}
+                    comments={post.comments}
+                    commentsSectionType={postType}
+                    propertyId={post.id}
                 />
             </div>
         </div>
     );
 };
 
-export default QuestionPost;
+export default Post;

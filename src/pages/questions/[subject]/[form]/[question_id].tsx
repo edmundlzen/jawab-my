@@ -9,7 +9,7 @@ import { Layout } from "../../../../components/Layout";
 import { useRouter } from "next/router";
 import { Button, InputWrapper, Text } from "@mantine/core";
 import { Divider } from "@mantine/core";
-import { QuestionPost, AnswerPost } from "../../../../components/Questions";
+import { Post } from "../../../../components/Questions";
 import { RichTextEditor } from "../../../../components/RichTextEditor";
 import { useRef, useState } from "react";
 import { showNotification } from "@mantine/notifications";
@@ -171,7 +171,7 @@ const QuestionView = (
                             <span className={"font-semibold"}>N/A times</span>
                         </Text>
                     </div>
-                    <QuestionPost question={questionPost.data} />
+                    <Post question={questionPost.data} />
                 </div>
                 {/* end of question */}
                 {questionPost.data.answers.length > 0 && (
@@ -184,9 +184,7 @@ const QuestionView = (
                     <div>
                         {questionPost.data.answers &&
                             questionPost.data.answers.map((answer, index) => {
-                                return (
-                                    <AnswerPost answer={answer} key={index} />
-                                );
+                                return <Post answer={answer} key={index} />;
                             })}
                     </div>
                     <div className="bg-gray-100 border p-4 rounded-md">
