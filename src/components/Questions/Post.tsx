@@ -150,10 +150,10 @@ const Post = (props: PostProps) => {
 
     const handleDeletePostButtonClick = () => {
         modals.openConfirmModal({
-            title: "Delete your question?",
+            title: `Delete your ${postType}?`,
             children: (
                 <Text size="sm">
-                    Are you sure you want to delete your question?
+                    Are you sure you want to delete your {postType}?
                 </Text>
             ),
             labels: { confirm: "Confirm", cancel: "Cancel" },
@@ -170,27 +170,32 @@ const Post = (props: PostProps) => {
                             await answersDelete.mutateAsync({
                                 answerId: post.id,
                             });
+                            showNotification({
+                                title: "Answer deleted",
+                                message: "Your answer has been deleted",
+                            });
+                            utils.invalidateQueries(["questions.getById"]);
+                            utils.invalidateQueries(["questions.getAll"]);
                             break;
                         case "question":
                             await questionsDelete.mutateAsync({
                                 questionId: post.id,
                             });
+                            showNotification({
+                                title: "Question deleted",
+                                message: "Your question has been deleted",
+                            });
+                            utils.invalidateQueries(["questions.getAll"]);
+                            router.back();
                             break;
                     }
-                    showNotification({
-                        title: "Question deleted",
-                        message: "Your question has been deleted",
-                    });
-                    utils.invalidateQueries(["questions.getAll"]);
-                    router.back();
                 } catch (e: any) {
                     showNotification({
                         title: "Error",
                         message: "Something went wrong",
                     });
-                    setLoading(false);
-                    return;
                 }
+                setLoading(false);
             },
         });
     };
