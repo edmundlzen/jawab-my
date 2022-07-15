@@ -3,6 +3,7 @@ import { Icon } from "@iconify-icon/react";
 import { useRouter } from "next/router";
 import SidebarItem from "./SidebarItem";
 import { subjects } from "../../../constants";
+import { trpc } from "../../../utils/trpc";
 
 type SidebarProps = {
     navbarOpen: boolean;
@@ -10,6 +11,9 @@ type SidebarProps = {
 
 export default function Sidebar(props: SidebarProps) {
     const router = useRouter();
+    const subjectQuestionsCount = trpc.useQuery([
+        "questions.getAllCountBySubject",
+    ]);
 
     return (
         <div
@@ -31,6 +35,10 @@ export default function Sidebar(props: SidebarProps) {
                     key={index}
                     pathName={"/questions/" + subject}
                     text={subjects[subject] as string}
+                    count={
+                        subjectQuestionsCount.data &&
+                        subjectQuestionsCount.data[subject]
+                    }
                 />
             ))}
         </div>
