@@ -226,15 +226,11 @@ const Post = (props: PostProps) => {
                             }
                         />
                     </div>
-                    <div
-                        className={
-                            "flex justify-center items-center my-4 cursor-pointer"
-                        }
-                    >
+                    <div className={"flex justify-center items-center my-4"}>
                         <Text className={"text-xl"}>{votes}</Text>
                     </div>
                     <div
-                        className={"flex justify-center items-center group"}
+                        className={"flex justify-center items-center group cursor-pointer"}
                         onClick={() => handleVoteButtonClick(VoteType.down)}
                     >
                         <Icon
