@@ -166,4 +166,33 @@ export const answersRouter = createRouter()
                 });
             }
         },
+    })
+    .mutation("update", {
+        input: z.object({
+            answerId: z.string(),
+            content: z.string().min(10).max(1000).optional(),
+        }),
+        async resolve({ ctx, input }) {
+            const { answerId } = input;
+            const userId = ctx.session!.userId as string;
+
+            const answer = await ctx.prisma.answer.findUnique({
+                where: { id: answerId },
+            });
+
+            if (!answer) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            if (answer.userId !== userId) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            return ctx.prisma.answer.update({
+                where: { id: answerId },
+                data: {
+                    content: input.content,
+                },
+            });
+        },
     });

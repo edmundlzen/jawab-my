@@ -271,4 +271,48 @@ export const questionsRouter = createRouter()
                 },
             });
         },
+    })
+    .mutation("update", {
+        input: z.object({
+            questionId: z.string(),
+            subject: z.nativeEnum(Subject).optional(),
+            form: z.nativeEnum(Form).optional(),
+            title: z.string().min(10).max(100).optional(),
+            content: z.string().min(10).max(1000).optional(),
+            tags: z.array(z.string().min(1).max(30)).max(5).optional(),
+        }),
+        async resolve({ ctx, input }) {
+            const { questionId } = input;
+            const userId = ctx.session!.userId as string;
+            const question = await ctx.prisma.question.findUnique({
+                where: { id: questionId },
+            });
+            if (!question) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+            if (question.userId !== userId) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+            return ctx.prisma.question.update({
+                where: { id: questionId },
+                data: {
+                    subject: input.subject,
+                    form: input.form,
+                    title: input.title,
+                    content: input.content,
+                    tags: input.tags
+                        ? {
+                              connectOrCreate: input.tags.map((tag) => ({
+                                  where: {
+                                      name: tag,
+                                  },
+                                  create: {
+                                      name: tag,
+                                  },
+                              })),
+                          }
+                        : undefined,
+                },
+            });
+        },
     });

@@ -1,5 +1,5 @@
 import { Icon } from "@iconify-icon/react";
-import { Badge, Button, Divider, Text } from "@mantine/core";
+import { Badge, Button, Divider, LoadingOverlay, Text } from "@mantine/core";
 import { RichTextEditor } from "../RichTextEditor";
 import { useEffect, useState } from "react";
 import { showNotification } from "@mantine/notifications";
@@ -36,12 +36,15 @@ type PostProps = CommonPostProps & ConditionalPostProps;
 
 const Post = (props: PostProps) => {
     const [voteType, setVoteType] = useState<"up" | "down" | null>(null);
+    const [editable, setEditable] = useState(false);
     const { loading, setLoading } = useLoading();
     const { data: session, status } = useSession();
     const questionsVote = trpc.useMutation(["questions.vote"]);
     const questionsDelete = trpc.useMutation(["questions.delete"]);
+    const questionsUpdate = trpc.useMutation(["questions.update"]);
     const answersVote = trpc.useMutation(["answers.vote"]);
     const answersDelete = trpc.useMutation(["answers.delete"]);
+    const answersUpdate = trpc.useMutation(["answers.update"]);
     const utils = trpc.useContext();
     const router = useRouter();
     const modals = useModals();
@@ -51,6 +54,8 @@ const Post = (props: PostProps) => {
         (answer as QuestionOutput["answers"][0]) ||
         (question as QuestionOutput);
     const [votes, setVotes] = useState(post.votesCount);
+    const [postContent, setPostContent] = useState<string>(post.content);
+    const [loadingEditing, setLoadingEditing] = useState(false);
 
     useEffect(() => {
         if (status === "authenticated") {
@@ -205,6 +210,44 @@ const Post = (props: PostProps) => {
         });
     };
 
+    const saveEditedPost = async () => {
+        setLoadingEditing(true);
+        try {
+            switch (postType) {
+                case "answer":
+                    await answersUpdate.mutateAsync({
+                        answerId: post.id,
+                        content: postContent,
+                    });
+                    showNotification({
+                        title: "Answer updated",
+                        message: "Your answer has been updated",
+                    });
+                    utils.invalidateQueries(["questions.getById"]);
+                    utils.invalidateQueries(["questions.getAll"]);
+                    break;
+                case "question":
+                    await questionsUpdate.mutateAsync({
+                        questionId: post.id,
+                        content: postContent,
+                    });
+                    showNotification({
+                        title: "Question updated",
+                        message: "Your question has been updated",
+                    });
+                    utils.invalidateQueries(["questions.getAll"]);
+                    break;
+            }
+            setEditable(false);
+        } catch (e: any) {
+            showNotification({
+                title: "Error",
+                message: "Something went wrong",
+            });
+        }
+        setLoadingEditing(false);
+    };
+
     return (
         <div className={"border-b py-4 last:border-b-0"}>
             <div className={"flex"}>
@@ -230,7 +273,9 @@ const Post = (props: PostProps) => {
                         <Text className={"text-xl"}>{votes}</Text>
                     </div>
                     <div
-                        className={"flex justify-center items-center group cursor-pointer"}
+                        className={
+                            "flex justify-center items-center group cursor-pointer"
+                        }
                         onClick={() => handleVoteButtonClick(VoteType.down)}
                     >
                         <Icon
@@ -245,18 +290,35 @@ const Post = (props: PostProps) => {
                         />
                     </div>
                 </div>
-                <div className={"flex-1"}>
-                    <RichTextEditor
-                        readOnly
-                        value={post.content}
-                        onChange={() => {}}
-                        styles={{
-                            root: {
-                                border: "none",
-                            },
-                        }}
-                        editorRef={null}
-                    />
+                <div className={"flex-1 relative"}>
+                    <LoadingOverlay visible={loadingEditing} />
+                    <div className={editable ? "border rounded-md mb-2" : ""}>
+                        <RichTextEditor
+                            readOnly={!editable}
+                            value={postContent}
+                            onChange={setPostContent}
+                            styles={{
+                                root: {
+                                    border: "none",
+                                },
+                            }}
+                            editorRef={null}
+                        />
+                    </div>
+                    {editable && (
+                        <div className={"flex justify-end mb-6"}>
+                            <Button
+                                className={"bg-blue-500"}
+                                onClick={() => {
+                                    saveEditedPost();
+                                }}
+                                loading={loading}
+                                disabled={loading}
+                            >
+                                Save
+                            </Button>
+                        </div>
+                    )}
                     {question && (
                         <div
                             className={
@@ -293,24 +355,42 @@ const Post = (props: PostProps) => {
                                     {post.user.name}
                                 </span>
                             </Text>
-                            <div className={"flex mt-2"}>
+                            <div className={"flex flex-col mt-2"}>
                                 {post.user.id === session?.userId && (
-                                    <div
-                                        className={
-                                            "cursor-pointer select-none group"
-                                        }
-                                        onClick={() =>
-                                            handleDeletePostButtonClick()
-                                        }
-                                    >
-                                        <Text
+                                    <>
+                                        <div
                                             className={
-                                                "text-xs text-red-600 group-hover:font-semibold"
+                                                "cursor-pointer select-none group"
+                                            }
+                                            onClick={() =>
+                                                handleDeletePostButtonClick()
                                             }
                                         >
-                                            Delete
-                                        </Text>
-                                    </div>
+                                            <Text
+                                                className={
+                                                    "text-xs text-red-600 group-hover:font-semibold"
+                                                }
+                                            >
+                                                Delete
+                                            </Text>
+                                        </div>
+                                        <div
+                                            className={
+                                                "cursor-pointer select-none group"
+                                            }
+                                            onClick={() =>
+                                                setEditable(!editable)
+                                            }
+                                        >
+                                            <Text
+                                                className={
+                                                    "text-xs text-blue-500 group-hover:font-semibold"
+                                                }
+                                            >
+                                                {editable ? "Cancel" : "Edit"}
+                                            </Text>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
