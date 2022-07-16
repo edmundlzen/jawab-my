@@ -1,5 +1,5 @@
 import { Icon } from "@iconify-icon/react";
-import { Button } from "@mantine/core";
+import { Button, Loader } from "@mantine/core";
 import { Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -60,33 +60,54 @@ export default function Header(props: HeaderProps) {
                     className={"text-2xl flex-1"}
                 />
             </div>
-            {status !== "authenticated" ? (
-                <Button
-                    className={"mr-5 sm:ml-auto bg-red-400"}
-                    color={"red"}
-                    onClick={() => router.push("/api/auth/signin")}
-                >
-                    <Text>Login</Text>
-                </Button>
-            ) : (
-                <div
-                    className={
-                        "h-full ml-auto mr-4 flex justify-center items-center"
-                    }
-                >
-                    <div
-                        className="h-full flex justify-center items-center px-6 bg-white hover:bg-gray-300 transition-all cursor-pointer select-none"
-                        onClick={() => router.push("/profile/me")}
-                    >
-                        <img
-                            src={
-                                session!.user!.image ? session!.user!.image : ""
-                            }
-                            className={"h-4/6 object-cover rounded"}
-                        />
-                    </div>
-                </div>
-            )}
+            {(() => {
+                switch (status) {
+                    case "unauthenticated":
+                        return (
+                            <Button
+                                className={"mr-5 sm:ml-auto bg-red-400"}
+                                color={"red"}
+                                onClick={() => router.push("/api/auth/signin")}
+                            >
+                                <Text>Login</Text>
+                            </Button>
+                        );
+                    case "loading":
+                        return (
+                            <div
+                                className={
+                                    "h-full ml-auto mr-4 flex justify-center items-center"
+                                }
+                            >
+                                <Loader />
+                            </div>
+                        );
+                    case "authenticated":
+                        return (
+                            <div
+                                className={
+                                    "h-full ml-auto mr-4 flex justify-center items-center"
+                                }
+                            >
+                                <div
+                                    className="h-full flex justify-center items-center px-6 bg-white hover:bg-gray-300 transition-all cursor-pointer select-none"
+                                    onClick={() => router.push("/profile/me")}
+                                >
+                                    <img
+                                        src={
+                                            session!.user!.image
+                                                ? session!.user!.image
+                                                : ""
+                                        }
+                                        className={"h-4/6 object-cover rounded"}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    default:
+                        return <div>Unknown status</div>;
+                }
+            })()}
         </div>
     );
 }
