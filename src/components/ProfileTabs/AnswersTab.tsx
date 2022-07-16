@@ -11,7 +11,14 @@ const AnswersTab = (props: AnswersTabProps) => {
     return (
         <div>
             {props.answers.map((answer) => {
-                return <Post key={answer.id} answer={answer} />;
+                return (
+                    <Post
+                        key={answer.id}
+                        answer={answer}
+                        hideCommentsSection
+                        disableVoting
+                    />
+                );
             })}
         </div>
     );

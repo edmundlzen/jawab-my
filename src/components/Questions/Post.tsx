@@ -16,7 +16,11 @@ import CommentsSection from "./CommentsSection";
 
 type QuestionOutput = InferQueryOutput<"questions.getById">;
 
-interface CommonPostProps {}
+interface CommonPostProps {
+    hideCommentsSection?: boolean;
+    hidePostedBy?: boolean;
+    disableVoting?: boolean;
+}
 
 type ConditionalPostProps =
     | {
@@ -66,6 +70,7 @@ const Post = (props: PostProps) => {
     }, [post.votesCount]);
 
     const handleVoteButtonClick = async (voteButtonClickType: VoteType) => {
+        if (props.disableVoting) return;
         if (status !== "authenticated") {
             showNotification({
                 title: "Please log in",
@@ -212,7 +217,10 @@ const Post = (props: PostProps) => {
                             icon={"bi:arrow-up-circle-fill"}
                             className={
                                 "text-3xl transition-all duration-75" +
-                                (voteType === "up" ? " text-red-600" : "")
+                                (voteType === "up" ? " text-red-600" : "") +
+                                (props.disableVoting
+                                    ? " opacity-50 cursor-not-allowed"
+                                    : "")
                             }
                         />
                     </div>
@@ -226,8 +234,11 @@ const Post = (props: PostProps) => {
                         <Icon
                             icon={"bi:arrow-down-circle-fill"}
                             className={
-                                "text-3xl group-hover:text-red-800 transition-all duration-75" +
-                                (voteType === "down" ? " text-red-600" : "")
+                                "text-3xl transition-all duration-75" +
+                                (voteType === "down" ? " text-red-600" : "") +
+                                (props.disableVoting
+                                    ? " opacity-50 cursor-not-allowed"
+                                    : "")
                             }
                         />
                     </div>
@@ -305,16 +316,20 @@ const Post = (props: PostProps) => {
                 </div>
             </div>
             {/*	Comments */}
-            <div>
-                <div className={"flex items-center mb-2"}>
-                    <Text className={"text-lg font-semibold"}>Comments</Text>
+            {props.hideCommentsSection ? null : (
+                <div>
+                    <div className={"flex items-center mb-2"}>
+                        <Text className={"text-lg font-semibold"}>
+                            Comments
+                        </Text>
+                    </div>
+                    <CommentsSection
+                        comments={post.comments}
+                        commentsSectionType={postType}
+                        propertyId={post.id}
+                    />
                 </div>
-                <CommentsSection
-                    comments={post.comments}
-                    commentsSectionType={postType}
-                    propertyId={post.id}
-                />
-            </div>
+            )}
         </div>
     );
 };
