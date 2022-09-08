@@ -56,6 +56,8 @@ model User {
   viewedQuestions  QuestionView[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
+  schoolId         String?
+  school           School?           @relation(fields: [schoolId], references: [id], onDelete: SetNull)
 }
 
 model VerificationToken {
@@ -107,7 +109,7 @@ model Question {
   answers   Answer[]
   comments  QuestionComment[]
   views     QuestionView[]
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @default(now())
 }
@@ -128,7 +130,7 @@ model QuestionComment {
   userId     String
   questionId String
   content    String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: SetNull)
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
@@ -149,7 +151,7 @@ model Answer {
   userId     String
   votes      AnswerVote[]
   comments   AnswerComment[]
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: SetNull)
   question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @default(now())
@@ -173,20 +175,29 @@ model AnswerComment {
   answerId  String
   content   String   @db.Text
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: SetNull)
   answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
 
 model QuestionView {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   questionId String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  question  Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 
   @@unique([userId, questionId])
+}
+
+model School {
+  id    String @id @unique
+  name  String
+  state String
+  city  String
+  ppd   String
+  users User[]
 }
