@@ -1,5 +1,5 @@
 import { Badge, Text } from "@mantine/core";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 

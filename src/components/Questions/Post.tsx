@@ -1,4 +1,4 @@
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import { Badge, Button, Divider, LoadingOverlay, Text } from "@mantine/core";
 import { RichTextEditor } from "../RichTextEditor";
 import { useEffect, useState } from "react";

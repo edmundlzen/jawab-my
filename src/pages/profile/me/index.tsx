@@ -6,7 +6,7 @@ import { Layout } from "../../../components/Layout";
 import { Text } from "@mantine/core";
 import { trpc } from "../../../utils/trpc";
 import { Tabs } from "@mantine/core";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import moment from "moment";
 import {
     ProfileTab,

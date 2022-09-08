@@ -1,4 +1,4 @@
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import { Button, Loader } from "@mantine/core";
 import { Text } from "@mantine/core";
 import { useRouter } from "next/router";

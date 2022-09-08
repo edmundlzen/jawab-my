@@ -4,7 +4,7 @@ import { Badge, Button, InputWrapper, Select, TextInput } from "@mantine/core";
 import { RichTextEditor } from "../components/RichTextEditor";
 import { useCallback, useState } from "react";
 import { showNotification } from "@mantine/notifications";
-import { Icon } from "@iconify-icon/react";
+import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import { useLoading } from "../hooks";
 import { subjects } from "../constants";
