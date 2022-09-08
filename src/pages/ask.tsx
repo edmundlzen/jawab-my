@@ -2,7 +2,7 @@ import type { NextPage, NextPageContext } from "next";
 import { Layout } from "../components/Layout";
 import { Badge, Button, InputWrapper, Select, TextInput } from "@mantine/core";
 import { RichTextEditor } from "../components/RichTextEditor";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { Icon } from "@iconify-icon/react";
 import { useRouter } from "next/router";
@@ -84,6 +84,26 @@ const Ask: NextPage = () => {
         setLoading(false);
     };
 
+    const handleImageUpload = useCallback(
+        (file: File): Promise<string> =>
+            new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append("image", file);
+
+                fetch(
+                    "https://api.imgbb.com/1/upload?key=26b4138fa708c848faae9936fc69666a",
+                    {
+                        method: "POST",
+                        body: formData,
+                    }
+                )
+                    .then((response) => response.json())
+                    .then((result) => resolve(result.data.url))
+                    .catch(() => reject(new Error("Upload failed")));
+            }),
+        []
+    );
+
     return (
         <Layout>
             <div className={"relative"}>
@@ -141,13 +161,20 @@ const Ask: NextPage = () => {
                             value={questionContent}
                             onChange={setQuestionContent}
                             editorRef={null}
-                            // controls={[
-                            // 	['bold', 'italic', 'underline', 'link', 'image'],
-                            // 	['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                            // 	['unorderedList', 'orderedList'],
-                            // 	['alignLeft', 'alignCenter', 'alignRight'],
-                            // 	['sup', 'sub'],
-                            // ]}
+                            onImageUpload={handleImageUpload}
+                            controls={[
+                                [
+                                    "bold",
+                                    "italic",
+                                    "underline",
+                                    "link",
+                                    "image",
+                                ],
+                                // ["h1", "h2", "h3", "h4", "h5", "h6"],
+                                ["unorderedList", "orderedList"],
+                                ["alignLeft", "alignCenter", "alignRight"],
+                                // ["sup", "sub"],
+                            ]}
                         />
                     </InputWrapper>
                     <div className={"flex flex-wrap gap-y-3"}>
