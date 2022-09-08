@@ -162,19 +162,6 @@ const Ask: NextPage = () => {
                             onChange={setQuestionContent}
                             editorRef={null}
                             onImageUpload={handleImageUpload}
-                            controls={[
-                                [
-                                    "bold",
-                                    "italic",
-                                    "underline",
-                                    "link",
-                                    "image",
-                                ],
-                                // ["h1", "h2", "h3", "h4", "h5", "h6"],
-                                ["unorderedList", "orderedList"],
-                                ["alignLeft", "alignCenter", "alignRight"],
-                                // ["sup", "sub"],
-                            ]}
                         />
                     </InputWrapper>
                     <div className={"flex flex-wrap gap-y-3"}>
