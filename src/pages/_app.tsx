@@ -13,7 +13,7 @@ import { ModalsProvider } from "@mantine/modals";
 const MyApp: AppType = ({
     Component,
     pageProps: { session, ...pageProps },
-}) => {
+}: any) => {
     return (
         <>
             <Head>
