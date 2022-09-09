@@ -19,7 +19,7 @@ import { Status404 } from "../../components/StatusCodes";
 
 interface ProfileProps {}
 
-const Profile: NextPage<ProfileProps> = (props) => {
+const Profile: NextPage<ProfileProps> = () => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const user = trpc.useQuery(
