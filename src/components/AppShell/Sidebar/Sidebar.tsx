@@ -35,10 +35,10 @@ export default function Sidebar(props: SidebarProps) {
                     key={index}
                     pathName={"/questions/" + subject}
                     text={subjects[subject] as string}
-                    count={
-                        subjectQuestionsCount.data &&
-                        subjectQuestionsCount.data[subject]
-                    }
+                    // count={
+                    //     subjectQuestionsCount.data &&
+                    //     subjectQuestionsCount.data[subject]
+                    // }
                 />
             ))}
         </div>
