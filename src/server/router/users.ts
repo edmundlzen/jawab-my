@@ -40,6 +40,16 @@ export const usersRouter = createRouter()
                             user: true,
                             comments: { include: { user: true } },
                             votes: true,
+                            question: {
+                                include: {
+                                    tags: true,
+                                },
+                            },
+                            _count: {
+                                select: {
+                                    comments: true,
+                                },
+                            },
                         },
                     },
                     answerComments: true,

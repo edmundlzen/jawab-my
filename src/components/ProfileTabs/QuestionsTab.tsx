@@ -1,7 +1,7 @@
 import { InferQueryOutput } from "../../utils/trpc";
 import { QuestionCard } from "../QuestionsView";
 
-type UserDataQueryOutput = InferQueryOutput<"users.getMe">;
+type UserDataQueryOutput = InferQueryOutput<"users.getByUsername">;
 
 interface QuestionsTabProps {
     questions: UserDataQueryOutput["questions"];

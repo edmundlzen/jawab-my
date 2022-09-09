@@ -1,7 +1,7 @@
 import { InferQueryOutput } from "../../utils/trpc";
-import { Post } from "../Questions";
+import { AnswerCard } from "../QuestionsView";
 
-type UserDataQueryOutput = InferQueryOutput<"users.getMe">;
+type UserDataQueryOutput = InferQueryOutput<"users.getByUsername">;
 
 interface AnswersTabProps {
     answers: UserDataQueryOutput["answers"];
@@ -11,14 +11,7 @@ const AnswersTab = (props: AnswersTabProps) => {
     return (
         <div>
             {props.answers.map((answer) => {
-                return (
-                    <Post
-                        key={answer.id}
-                        answer={answer}
-                        hideCommentsSection
-                        disableVoting
-                    />
-                );
+                return <AnswerCard key={answer.id} answer={answer} />;
             })}
         </div>
     );
