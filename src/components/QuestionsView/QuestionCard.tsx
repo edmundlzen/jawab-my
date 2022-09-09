@@ -58,7 +58,15 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                     {sanitizeHtml(props.question.content, {
                         allowedTags: [],
                         allowedAttributes: {},
-                    })}
+                    }).length > 100
+                        ? sanitizeHtml(props.question.content, {
+                              allowedTags: [],
+                              allowedAttributes: {},
+                          }).substring(0, 100) + "..."
+                        : sanitizeHtml(props.question.content, {
+                              allowedTags: [],
+                              allowedAttributes: {},
+                          })}
                 </Text>
                 <div className={"mt-4 flex flex-row"}>
                     <div
