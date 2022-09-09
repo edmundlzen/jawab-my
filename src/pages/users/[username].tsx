@@ -2,9 +2,9 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Layout } from "../../../components/Layout";
+import { Layout } from "../../components/Layout";
 import { Text } from "@mantine/core";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../utils/trpc";
 import { Tabs } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import moment from "moment";
@@ -14,20 +14,19 @@ import {
     QuestionsTab,
     SettingsTab,
     VotedTab,
-} from "../../../components/ProfileTabs";
+} from "../../components/ProfileTabs";
+import { Status404 } from "../../components/StatusCodes";
 
 interface ProfileProps {}
 
 const Profile: NextPage<ProfileProps> = (props) => {
     const router = useRouter();
     const { data: session, status } = useSession();
-    const user = trpc.useQuery(["users.getMe"]);
-
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/api/auth/signin");
-        }
-    }, [status, router]);
+    const user = trpc.useQuery(
+        ["users.getByUsername", { username: router.query.username as string }],
+        { retry: false }
+    );
+    const isSelf = session?.username === router.query.username;
 
     useEffect(() => {
         if (user.data) {
@@ -42,10 +41,10 @@ const Profile: NextPage<ProfileProps> = (props) => {
             </Layout>
         );
     }
-    if (status === "unauthenticated" || !user.data) {
+    if (!user.data) {
         return (
             <Layout>
-                <div>Unauthenticated</div>
+                <Status404 customMessage="User not found" />
             </Layout>
         );
     }
@@ -56,7 +55,7 @@ const Profile: NextPage<ProfileProps> = (props) => {
                 <div className={"flex"}>
                     <img
                         className="rounded-md mr-4"
-                        src={session!.user!.image ? session!.user!.image : ""}
+                        src={user.data.image || ""}
                     />
                     <div>
                         <Text className={"text-3xl font-medium"}>

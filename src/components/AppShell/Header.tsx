@@ -91,7 +91,11 @@ export default function Header(props: HeaderProps) {
                             >
                                 <div
                                     className="h-full flex justify-center items-center px-6 bg-white hover:bg-gray-300 transition-all cursor-pointer select-none"
-                                    onClick={() => router.push("/profile/me")}
+                                    onClick={() =>
+                                        router.push(
+                                            `/users/${session!.username}`
+                                        )
+                                    }
                                 >
                                     <img
                                         src={

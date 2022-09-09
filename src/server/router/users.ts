@@ -14,10 +14,13 @@ export const usersRouter = createRouter()
         }
         return next();
     })
-    .query("getMe", {
-        async resolve({ ctx }) {
+    .query("getByUsername", {
+        input: z.object({
+            username: z.string(),
+        }),
+        async resolve({ ctx, input }) {
             const user = await ctx.prisma.user.findUnique({
-                where: { id: ctx.session!.userId as string },
+                where: { username: input.username },
                 include: {
                     questions: {
                         include: {
@@ -27,7 +30,7 @@ export const usersRouter = createRouter()
                             _count: {
                                 select: {
                                     answers: true,
-                                    views: true
+                                    views: true,
                                 },
                             },
                         },
