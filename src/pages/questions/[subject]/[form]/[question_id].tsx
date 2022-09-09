@@ -188,7 +188,6 @@ const QuestionView = (
                         {questionPost.data.answers.length} Answers
                     </div>
                 )}
-                <Divider className={"mt-5"} />
                 <div>
                     <div>
                         {questionPost.data.answers &&
