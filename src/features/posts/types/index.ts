@@ -1,0 +1,1 @@
+export {default as PostTypes} from './post-types';

@@ -1,9 +1,9 @@
-import { Button, Text } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import { QuestionCard } from "./index";
+import { Text } from "@/components/ui/core";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { InferQueryOutput } from "../../utils/trpc";
+import { InferQueryOutput } from "@/utils/trpc";
+import { AskQuestionButton } from "@/features/posts/question";
+import { QuestionCard } from "@/features/cards/";
 
 type QuestionsOutput = InferQueryOutput<"questions.getAll">;
 
@@ -12,7 +12,7 @@ interface QuestionViewProps {
     questions: QuestionsOutput;
 }
 
-const QuestionView = (props: QuestionViewProps) => {
+const PostsView = (props: QuestionViewProps) => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const { title, questions } = props;
@@ -27,23 +27,7 @@ const QuestionView = (props: QuestionViewProps) => {
                 >
                     {title}
                 </Text>
-                <Button
-                    className={"bg-teal-400 mr-4"}
-                    color={"teal"}
-                    onClick={async () => {
-                        if (status !== "authenticated") {
-                            showNotification({
-                                title: "Please log in",
-                                message:
-                                    "You must be logged in to ask a question",
-                            });
-                            return;
-                        }
-                        await router.push("/ask");
-                    }}
-                >
-                    <Text className={"text-sm"}>Ask question</Text>
-                </Button>
+                <AskQuestionButton />
             </div>
             <div className={"flex-1 flex flex-col"}>
                 {questions.length === 0 && (
@@ -55,11 +39,11 @@ const QuestionView = (props: QuestionViewProps) => {
                     </div>
                 )}
                 {questions.map((question, index) => {
-                    return <QuestionCard question={question} key={index} />;
+                    return <QuestionCard question={question} key={index}/>;
                 })}
             </div>
         </div>
     );
 };
 
-export default QuestionView;
+export default PostsView;

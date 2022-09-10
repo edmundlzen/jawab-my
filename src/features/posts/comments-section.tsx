@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 
 type QuestionOutput = InferQueryOutput<"questions.getById">;
 
-interface CommentSectionProps {
+interface CommentsSectionProps {
     comments:
         | QuestionOutput["comments"]
         | QuestionOutput["answers"][0]["comments"];
@@ -19,7 +19,7 @@ interface CommentSectionProps {
     propertyId: string;
 }
 
-const CommentsSection = (props: CommentSectionProps) => {
+const CommentsSection = (props: CommentsSectionProps) => {
     const [commentBoxVisible, setCommentBoxVisible] = useState(false);
     const [commentContent, setCommentContent] = useState("");
     const { loading, setLoading } = useLoading();

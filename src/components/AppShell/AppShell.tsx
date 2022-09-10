@@ -2,7 +2,7 @@ import { Header, Footer, Sidebar } from "./";
 import { useEffect, useState } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useLoading } from "../../hooks";
+import { usePageLoading } from "../../hooks";
 
 type AppShellProps = {
     children: React.ReactNode;
@@ -13,17 +13,17 @@ export default function AppShell(props: AppShellProps) {
     const router = useRouter();
     const { children, hideSidebar } = props;
     const [navbarOpen, setNavbarOpen] = useState(false);
-    const { loading, setLoading } = useLoading();
+    const { pageLoading, setPageLoading } = usePageLoading();
 
     useEffect(() => {
-        if (!setLoading) return;
+        if (!setPageLoading) return;
         router.events.on("routeChangeStart", () => {
-            setLoading(true);
+            setPageLoading(true);
         });
         router.events.on("routeChangeComplete", () => {
-            setLoading(false);
+            setPageLoading(false);
         });
-    }, [router, setLoading]);
+    }, [router, setPageLoading]);
 
     return (
         <div className={"flex flex-col items-center w-full"}>
@@ -40,7 +40,7 @@ export default function AppShell(props: AppShellProps) {
                         "min-w-[100vw] sm:min-w-0 sm:w-[70vw] lg:w-[50vw] relative z-0"
                     }
                 >
-                    <LoadingOverlay visible={loading} />
+                    <LoadingOverlay visible={pageLoading} />
                     {!children && (
                         <div
                             className={

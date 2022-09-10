@@ -1,4 +1,3 @@
-// src/pages/_app.tsx
 import { withTRPC } from "@trpc/next";
 import type { AppRouter } from "../server/router";
 import type { AppType } from "next/dist/shared/lib/utils";
@@ -6,7 +5,7 @@ import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Head from "next/head";
-import { LoadingProvider } from "../hooks/useLoading";
+import { PageLoadingProvider } from "../hooks/use-page-loading";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 
@@ -22,9 +21,9 @@ const MyApp: AppType = ({
             <SessionProvider session={session}>
                 <NotificationsProvider>
                     <ModalsProvider>
-                        <LoadingProvider>
+                        <PageLoadingProvider>
                             <Component {...pageProps} />
-                        </LoadingProvider>
+                        </PageLoadingProvider>
                     </ModalsProvider>
                 </NotificationsProvider>
             </SessionProvider>

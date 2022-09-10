@@ -1,24 +1,28 @@
-import { Badge, Text } from "@mantine/core";
+import { Icon } from "@iconify/react";
+import { Badge, Button, Divider, LoadingOverlay, Text } from "@mantine/core";
+import { RichTextEditor } from "../RichTextEditor";
+import { useEffect, useState } from "react";
+import { showNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
+import moment from "moment";
+import { Textarea } from "@mantine/core";
+import { useModals } from "@mantine/modals";
+import { useLoading } from "../../hooks";
+import { useSession } from "next-auth/react";
+import { trpc, InferQueryOutput } from "@/utils/trpc";
+import { VoteType } from "@prisma/client";
 import sanitizeHtml from "sanitize-html";
-import { InferQueryOutput } from "../../utils/trpc";
 
-type QuestionsOutput = InferQueryOutput<"questions.getAll">;
+type AnswerOutput = InferQueryOutput<"users.getByUsername">["answers"][0];
 
-const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
+type AnswerCardProps = {
+    answer: AnswerOutput;
+};
+
+const AnswerCard = (props: AnswerCardProps) => {
+    const { data: session, status } = useSession();
+    const utils = trpc.useContext();
     const router = useRouter();
-
-    const daysAgo = (date: Date) => {
-        const diff = Date.now() - date.getTime();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        if (days === 0) {
-            return "today";
-        } else if (days === 1) {
-            return "yesterday";
-        } else {
-            return `${days} days ago`;
-        }
-    };
 
     return (
         <div
@@ -27,20 +31,20 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
             }
             onClick={() => {
                 router.push(
-                    `/questions/${props.question.subject}/${props.question.form}/${props.question.id}`
+                    `/questions/${props.answer.question.subject}/${props.answer.question.form}/${props.answer.question.id}`
                 );
             }}
         >
             <div className={"flex flex-row sm:flex-col justify-start gap-x-2"}>
                 <Text className={"text-xs font-bold"}>
-                    Votes: {props.question.votesCount}
+                    Votes: {props.answer.votesCount}
                 </Text>
                 <Text className={"text-xs font-semibold"}>
-                    Views: {props.question._count.views}
+                    Comments: {props.answer._count.comments}
                 </Text>
-                <Text className={"text-xs font-semibold"}>
+                {/* <Text className={"text-xs font-semibold"}>
                     Answers: {props.question._count.answers}
-                </Text>
+                </Text> */}
             </div>
             <div
                 className={
@@ -52,18 +56,18 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                         "text-md sm:text-xl font-semibold text-blue-600 group-hover:font-bold"
                     }
                 >
-                    {props.question.title}
+                    {props.answer.question.title}
                 </Text>
                 <Text className={"text-sm hidden sm:block"} lineClamp={1}>
-                    {sanitizeHtml(props.question.content, {
+                    {sanitizeHtml(props.answer.content, {
                         allowedTags: [],
                         allowedAttributes: {},
                     }).length > 100
-                        ? sanitizeHtml(props.question.content, {
+                        ? sanitizeHtml(props.answer.content, {
                               allowedTags: [],
                               allowedAttributes: {},
                           }).substring(0, 100) + "..."
-                        : sanitizeHtml(props.question.content, {
+                        : sanitizeHtml(props.answer.content, {
                               allowedTags: [],
                               allowedAttributes: {},
                           })}
@@ -75,11 +79,13 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                         }
                     >
                         <Badge color="gray">
-                            {props.question.subject.replace("_", " ")}
+                            {props.answer.question.subject.replace("_", " ")}
                         </Badge>
-                        <Badge color="gray">Form {props.question.form}</Badge>
-                        {props.question.tags.length !== 0
-                            ? props.question.tags.map((tag, index) => {
+                        <Badge color="gray">
+                            Form {props.answer.question.form}
+                        </Badge>
+                        {props.answer.question.tags.length !== 0
+                            ? props.answer.question.tags.map((tag, index) => {
                                   return (
                                       <Badge key={index} color={""}>
                                           {tag.name}
@@ -89,28 +95,10 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
                             : null}
                     </div>
                     <div className={"flex flex-col ml-1"}>
-                        <div
-                            className={
-                                "flex flex-row items-center justify-end gap-x-1"
-                            }
-                        >
-                            <img
-                                src={
-                                    props.question.user.image
-                                        ? props.question.user.image
-                                        : ""
-                                }
-                                className={"h-4 rounded-sm"}
-                                referrerPolicy={"no-referrer"}
-                            />
-                            <Text className={"text-xs font-semibold"}>
-                                {props.question.user.name}
-                            </Text>
-                        </div>
                         <div className={"mt-1"}>
                             <Text className={"text-xs font-semibold"}>
-                                Posted{" "}
-                                {daysAgo(new Date(props.question.createdAt))}
+                                Answered{" "}
+                                {daysAgo(new Date(props.answer.createdAt))}
                             </Text>
                         </div>
                     </div>
@@ -120,4 +108,4 @@ const QuestionCard = (props: { question: QuestionsOutput[0] }) => {
     );
 };
 
-export default QuestionCard;
+export default AnswerCard;

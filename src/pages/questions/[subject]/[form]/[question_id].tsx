@@ -5,36 +5,39 @@ import {
     GetStaticPropsContext,
     InferGetStaticPropsType,
 } from "next";
-import { Layout } from "../../../../components/Layout";
+import { Layout } from "@/components/Layout";
 import { useRouter } from "next/router";
-import { Button, InputWrapper, Text } from "@mantine/core";
-import { Divider } from "@mantine/core";
-import { Post } from "../../../../components/Questions";
-import { RichTextEditor } from "../../../../components/RichTextEditor";
+import { InputWrapper } from "@mantine/core";
+import { Button, Text } from "@/components/ui/core";
+import { Post } from "@/features/posts";
+import { RichTextEditor } from "@/components/ui/core";
 import { useEffect, useRef, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import sanitizeHtml from "sanitize-html";
-import { useLoading } from "../../../../hooks";
-import { InferQueryOutput, trpc } from "../../../../utils/trpc";
+import { usePageLoading } from "@/hooks";
+import { InferQueryOutput, trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
 import { Editor } from "@mantine/rte";
 import moment from "moment";
 import superjson from "superjson";
 import { createSSGHelpers } from "@trpc/react/ssg";
-import { appRouter } from "../../../../server/router";
-import { createContext } from "../../../../server/router/context";
+import { appRouter } from "@/server/router";
+import { createContext } from "@/server/router/context";
+import {QuestionPost} from "@/features/posts/question";
+import {AnswerPost} from "@/features/posts/answer";
+import {usePost} from "@/features/posts/hooks";
+import {PostTypes} from "@/features/posts/types";
 
 export async function getStaticProps(
     context: GetStaticPropsContext<{ question_id: string }>
 ) {
-    const ssg = await createSSGHelpers({
+    const ssg = createSSGHelpers({
         router: appRouter,
         ctx: await createContext(),
         transformer: superjson, // optional - adds superjson serialization
     });
     const questionId = context.params?.question_id as string;
 
-    // prefetch `post.byId`
     await ssg.fetchQuery("questions.getById", {
         questionId,
     });
@@ -75,7 +78,7 @@ const QuestionView = (
     const router = useRouter();
     const { questionId } = props;
     const [answerContent, setAnswerContent] = useState("");
-    const { loading, setLoading } = useLoading();
+    const { pageLoading, setPageLoading } = usePageLoading();
     const questionPost = trpc.useQuery(["questions.getById", { questionId }]);
     const createAnswer = trpc.useMutation(["answers.create"]);
     const createView = trpc.useMutation(["questions.view"]);
@@ -113,7 +116,7 @@ const QuestionView = (
         }
 
         try {
-            setLoading(true);
+            setPageLoading(true);
             await createAnswer.mutateAsync({
                 questionId: router.query.question_id as string,
                 content: answerContent,
@@ -122,12 +125,12 @@ const QuestionView = (
                 title: "Answer submitted",
                 message: "Your answer has been submitted successfully",
             });
-            utils.invalidateQueries(["questions.getById"]);
+            await utils.invalidateQueries(["questions.getById"]);
             editorRef.current?.editor?.clipboard.dangerouslyPasteHTML("");
-            setLoading(false);
+            setPageLoading(false);
         } catch (e) {
             console.error(e);
-            setLoading(false);
+            setPageLoading(false);
             showNotification({
                 title: "Error",
                 message: "An error occurred while submitting your answer",
@@ -180,7 +183,7 @@ const QuestionView = (
                             </span>
                         </Text>
                     </div>
-                    <Post question={questionPost.data} />
+                    <QuestionPost question={questionPost.data} />
                 </div>
                 {/* end of question */}
                 {questionPost.data.answers.length > 0 && (
@@ -192,7 +195,7 @@ const QuestionView = (
                     <div>
                         {questionPost.data.answers &&
                             questionPost.data.answers.map((answer, index) => {
-                                return <Post answer={answer} key={index} />;
+                                return <AnswerPost answer={answer} key={index} />;
                             })}
                     </div>
                     <div className="bg-gray-100 border p-4 rounded-md">
