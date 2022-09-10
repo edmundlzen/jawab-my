@@ -4,7 +4,7 @@ import { useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { useModals } from "@mantine/modals";
 import { useRouter } from "next/router";
-import { useLoading } from "../../hooks";
+import { usePageLoading } from "../../hooks";
 import { QuestionComment, AnswerComment } from "@prisma/client";
 import { InferQueryOutput, trpc } from "../../utils/trpc";
 import { useSession } from "next-auth/react";
@@ -22,7 +22,7 @@ interface CommentsSectionProps {
 const CommentsSection = (props: CommentsSectionProps) => {
     const [commentBoxVisible, setCommentBoxVisible] = useState(false);
     const [commentContent, setCommentContent] = useState("");
-    const { loading, setLoading } = useLoading();
+    const { pageLoading, setPageLoading } = usePageLoading();
     const { data: session, status } = useSession();
     const deleteQuestionComment = trpc.useMutation(["questions.deleteComment"]);
     const deleteAnswerComment = trpc.useMutation(["answers.deleteComment"]);
@@ -54,7 +54,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
             },
             onCancel: () => {},
             onConfirm: async () => {
-                setLoading(true);
+                setPageLoading(true);
                 try {
                     if (props.commentsSectionType === "question") {
                         await deleteQuestionComment.mutateAsync({
@@ -70,14 +70,14 @@ const CommentsSection = (props: CommentsSectionProps) => {
                         message: "Your comment has been deleted",
                     });
                     utils.invalidateQueries(["questions.getById"]);
-                    setLoading(false);
+                    setPageLoading(false);
                     return;
                 } catch (e) {
                     showNotification({
                         title: "Error",
                         message: "Something went wrong",
                     });
-                    setLoading(false);
+                    setPageLoading(false);
                     return;
                 }
             },
@@ -92,7 +92,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
             });
             return;
         }
-        setLoading(true);
+        setPageLoading(true);
         try {
             if (props.commentsSectionType === "question") {
                 await createQuestionComment.mutateAsync({
@@ -110,7 +110,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
                 message: "Your comment has been created",
             });
             utils.invalidateQueries(["questions.getById"]);
-            setLoading(false);
+            setPageLoading(false);
             setCommentBoxVisible(false);
             setCommentContent("");
             return;
@@ -119,7 +119,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
                 title: "Error",
                 message: "Something went wrong",
             });
-            setLoading(false);
+            setPageLoading(false);
             return;
         }
     };

@@ -6,10 +6,10 @@ import { useCallback, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
-import { useLoading } from "../hooks";
+import { usePageLoading } from "../hooks";
 import { subjects } from "../constants";
 import { useSession } from "next-auth/react";
-import { trpc } from "../utils/trpc";
+import { trpc } from "@/utils/trpc";
 import { Form, Subject } from "@prisma/client";
 
 const Ask: NextPage = () => {
@@ -21,7 +21,7 @@ const Ask: NextPage = () => {
     const [questionTags, setQuestionTags] = useState<any[]>([]);
     const [questionTagsInput, setQuestionTagsInput] = useState("");
     const { data: session, status } = useSession();
-    const { loading, setLoading } = useLoading();
+    const { pageLoading, setPageLoading } = usePageLoading();
     const createQuestion = trpc.useMutation(["questions.create"]);
 
     const handleTagsInputSubmit = (tag: string) => {
@@ -54,7 +54,7 @@ const Ask: NextPage = () => {
             });
             return;
         }
-        setLoading(true);
+        setPageLoading(true);
 
         try {
             await createQuestion.mutateAsync({
@@ -78,10 +78,10 @@ const Ask: NextPage = () => {
                 color: "red",
                 icon: <Icon icon="emojione-monotone:cross-mark" />,
             });
-            setLoading(false);
+            setPageLoading(false);
             return;
         }
-        setLoading(false);
+        setPageLoading(false);
     };
 
     const handleImageUpload = useCallback(

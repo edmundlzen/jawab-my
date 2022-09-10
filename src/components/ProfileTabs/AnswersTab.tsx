@@ -1,5 +1,5 @@
-import { InferQueryOutput } from "../../utils/trpc";
-import { AnswerCard } from "../QuestionsView";
+import { InferQueryOutput } from "@/utils/trpc";
+import { AnswerCard } from "@/features/cards";
 
 type UserDataQueryOutput = InferQueryOutput<"users.getByUsername">;
 

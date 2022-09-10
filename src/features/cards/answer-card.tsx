@@ -1,17 +1,9 @@
-import { Icon } from "@iconify/react";
-import { Badge, Button, Divider, LoadingOverlay, Text } from "@mantine/core";
-import { RichTextEditor } from "../RichTextEditor";
-import { useEffect, useState } from "react";
-import { showNotification } from "@mantine/notifications";
+import { Badge, Text } from "@/components/ui/core";
 import { useRouter } from "next/router";
-import moment from "moment";
-import { Textarea } from "@mantine/core";
-import { useModals } from "@mantine/modals";
-import { useLoading } from "../../hooks";
 import { useSession } from "next-auth/react";
 import { trpc, InferQueryOutput } from "@/utils/trpc";
-import { VoteType } from "@prisma/client";
 import sanitizeHtml from "sanitize-html";
+import { daysAgo } from "@/utils/index";
 
 type AnswerOutput = InferQueryOutput<"users.getByUsername">["answers"][0];
 

@@ -1,15 +1,15 @@
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import { Layout } from "../../../components/Layout";
-import { trpc } from "../../../utils/trpc";
+import { Layout } from "@/components/Layout";
+import { trpc } from "@/utils/trpc";
 import { QuestionView } from "../../../components/QuestionsView";
 import { Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import { Subject } from "@prisma/client";
 import { useEffect } from "react";
-import { useLoading } from "../../../hooks";
+import { usePageLoading } from "../../../hooks";
 import { createSSGHelpers } from "@trpc/react/ssg";
-import { appRouter } from "../../../server/router";
-import { createContext } from "../../../server/router/context";
+import { appRouter } from "@/server/router";
+import { createContext } from "@/server/router/context";
 import superjson from "superjson";
 
 export async function getStaticProps(
@@ -56,7 +56,6 @@ const SubjectView = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
         "questions.getBySubject",
         { subject: router.query.subject as Subject },
     ]);
-    const { setLoading } = useLoading();
 
     return (
         <Layout>

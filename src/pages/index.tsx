@@ -1,10 +1,7 @@
 import type { GetStaticPropsContext, NextPage } from "next";
-import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { Layout } from "../components/Layout";
 import { QuestionView } from "../components/QuestionsView";
-import { useEffect } from "react";
-import { useLoading } from "../hooks";
 import { createSSGHelpers } from "@trpc/react/ssg";
 import { appRouter } from "../server/router";
 import superjson from "superjson";
