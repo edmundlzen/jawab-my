@@ -12,7 +12,13 @@ export const questionsRouter = createRouter()
                 include: {
                     votes: true,
                     tags: true,
-                    user: true,
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            image: true,
+                        }
+                    },
                     _count: { select: { answers: true, views: true } },
                 },
             });
@@ -264,12 +270,19 @@ export const questionsRouter = createRouter()
             if (!question) {
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
-            await ctx.prisma.questionView.create({
-                data: {
-                    questionId,
-                    userId,
-                },
-            });
+            try {
+                await ctx.prisma.questionView.create({
+                    data: {
+                        questionId,
+                        userId,
+                    },
+                });
+            } catch (error: any) {
+                if (error.code === "P2002") {
+                    // Unique constraint failed
+                    return;
+                }
+            }
         },
     })
     .mutation("update", {
