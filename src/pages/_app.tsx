@@ -8,6 +8,9 @@ import Head from "next/head";
 import { PageLoadingProvider } from "../hooks/use-page-loading";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
+import { MantineProvider, createEmotionCache } from "@mantine/core";
+
+const emotionCache = createEmotionCache({ key: "mantine", prepend: false });
 
 const MyApp: AppType = ({
     Component,
@@ -19,13 +22,19 @@ const MyApp: AppType = ({
                 <link rel="icon" href="/images/favicon.ico" />
             </Head>
             <SessionProvider session={session}>
-                <NotificationsProvider>
-                    <ModalsProvider>
-                        <PageLoadingProvider>
-                            <Component {...pageProps} />
-                        </PageLoadingProvider>
-                    </ModalsProvider>
-                </NotificationsProvider>
+                <MantineProvider
+                    emotionCache={emotionCache}
+                    withGlobalStyles
+                    withNormalizeCSS
+                >
+                    <NotificationsProvider>
+                        <ModalsProvider>
+                            <PageLoadingProvider>
+                                <Component {...pageProps} />
+                            </PageLoadingProvider>
+                        </ModalsProvider>
+                    </NotificationsProvider>
+                </MantineProvider>
             </SessionProvider>
         </>
     );

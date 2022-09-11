@@ -1,7 +1,7 @@
 import type { NextPage, NextPageContext } from "next";
 import { Layout } from "../components/Layout";
-import { Badge, Button, InputWrapper, Select, TextInput } from "@mantine/core";
-import { RichTextEditor } from "../components/RichTextEditor";
+import { Badge, Button, Input, Select, TextInput } from "@mantine/core";
+import { RichTextEditor } from "@/components/ui/core/";
 import { useCallback, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { Icon } from "@iconify/react";
@@ -57,7 +57,7 @@ const Ask: NextPage = () => {
         setPageLoading(true);
 
         try {
-            await createQuestion.mutateAsync({
+            const newQuestion = await createQuestion.mutateAsync({
                 title: questionTitle,
                 content: questionContent,
                 subject: questionSubject as Subject,
@@ -68,9 +68,11 @@ const Ask: NextPage = () => {
                 title: "Success",
                 message: "Question created",
                 color: "green",
-                icon: <Icon icon="emojione-monotone:heavy_check_mark" />,
+                icon: <Icon icon="akar-icons:check" />,
             });
-            router.push("/");
+            router.push(
+                `/questions/${newQuestion.subject}/${newQuestion.form}/${newQuestion.id}`
+            );
         } catch (e) {
             showNotification({
                 title: "Error",
@@ -149,7 +151,7 @@ const Ask: NextPage = () => {
                             { value: "five", label: "Five" },
                         ]}
                     />
-                    <InputWrapper
+                    <Input.Wrapper
                         id="question-content"
                         required
                         label="Question"
@@ -157,13 +159,13 @@ const Ask: NextPage = () => {
                     >
                         <RichTextEditor
                             id="question-content"
-                            className={"min-h-[50vh]"}
+                            className={"min-h-[50vh] mt-2"}
                             value={questionContent}
                             onChange={setQuestionContent}
                             editorRef={null}
                             onImageUpload={handleImageUpload}
                         />
-                    </InputWrapper>
+                    </Input.Wrapper>
                     <div className={"flex flex-wrap gap-y-3"}>
                         {questionTags.length > 0 &&
                             questionTags.map((tag, index) => (
@@ -216,7 +218,7 @@ const Ask: NextPage = () => {
                         }}
                     />
                     <Button
-                        className={"mt-5 bg-blue-500"}
+                        className={"mt-5"}
                         onClick={async () => handleSubmit()}
                     >
                         Post

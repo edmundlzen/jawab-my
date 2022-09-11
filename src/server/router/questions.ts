@@ -17,7 +17,7 @@ export const questionsRouter = createRouter()
                             id: true,
                             username: true,
                             image: true,
-                        }
+                        },
                     },
                     _count: { select: { answers: true, views: true } },
                 },
@@ -120,8 +120,8 @@ export const questionsRouter = createRouter()
         input: z.object({
             subject: z.nativeEnum(Subject),
             form: z.nativeEnum(Form),
-            title: z.string().min(10).max(100),
-            content: z.string().min(10).max(1000),
+            title: z.string().max(100),
+            content: z.string().max(1000),
             tags: z.array(z.string().min(1).max(30)).max(5),
         }),
         async resolve({ ctx, input }) {

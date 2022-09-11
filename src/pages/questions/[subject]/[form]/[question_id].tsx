@@ -7,7 +7,7 @@ import {
 } from "next";
 import { Layout } from "@/components/Layout";
 import { useRouter } from "next/router";
-import { InputWrapper } from "@mantine/core";
+import { Input } from "@mantine/core";
 import { Button, Text } from "@/components/ui/core";
 import { Post } from "@/features/posts";
 import { RichTextEditor } from "@/components/ui/core";
@@ -23,10 +23,10 @@ import superjson from "superjson";
 import { createSSGHelpers } from "@trpc/react/ssg";
 import { appRouter } from "@/server/router";
 import { createContext } from "@/server/router/context";
-import {QuestionPost} from "@/features/posts/question";
-import {AnswerPost} from "@/features/posts/answer";
-import {usePost} from "@/features/posts/hooks";
-import {PostTypes} from "@/features/posts/types";
+import { QuestionPost } from "@/features/posts/question";
+import { AnswerPost } from "@/features/posts/answer";
+import { usePost } from "@/features/posts/hooks";
+import { PostTypes } from "@/features/posts/types";
 
 export async function getStaticProps(
     context: GetStaticPropsContext<{ question_id: string }>
@@ -195,7 +195,9 @@ const QuestionView = (
                     <div>
                         {questionPost.data.answers &&
                             questionPost.data.answers.map((answer, index) => {
-                                return <AnswerPost answer={answer} key={index} />;
+                                return (
+                                    <AnswerPost answer={answer} key={index} />
+                                );
                             })}
                     </div>
                     <div className="bg-gray-100 border p-4 rounded-md">
@@ -218,7 +220,7 @@ const QuestionView = (
                                         answer
                                     </Text>
                                     <Button
-                                        className={"bg-red-400 mt-4"}
+                                        className={"mt-4"}
                                         color={"red"}
                                         onClick={() =>
                                             router.push("/api/auth/signin")
@@ -233,7 +235,7 @@ const QuestionView = (
                                     status !== "authenticated" ? "blur-sm" : ""
                                 }
                             >
-                                <InputWrapper
+                                <Input.Wrapper
                                     id="answer-content"
                                     required
                                     label="Answer"
@@ -253,9 +255,9 @@ const QuestionView = (
                                         // ['sup', 'sub'],
                                         // ]}
                                     />
-                                </InputWrapper>
+                                </Input.Wrapper>
                                 <Button
-                                    className={"mt-5 bg-blue-500"}
+                                    className={"mt-5"}
                                     onClick={() => {
                                         handleAnswerSubmitButton();
                                     }}

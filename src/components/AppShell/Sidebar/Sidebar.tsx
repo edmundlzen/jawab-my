@@ -1,4 +1,4 @@
-import { Text } from "@mantine/core";
+import { Text } from "@/components/ui/core";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import SidebarItem from "./SidebarItem";

@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
-import { Button, Loader } from "@mantine/core";
-import { Text } from "@mantine/core";
+import { Loader } from "@mantine/core";
+import { Button, Text } from "@/components/ui/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -65,7 +65,7 @@ export default function Header(props: HeaderProps) {
                     case "unauthenticated":
                         return (
                             <Button
-                                className={"mr-5 sm:ml-auto bg-red-400"}
+                                className={"mr-5 sm:ml-auto"}
                                 color={"red"}
                                 onClick={() => router.push("/api/auth/signin")}
                             >

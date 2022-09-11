@@ -1,8 +1,9 @@
 import { Icon } from "@iconify/react";
-import { Badge, Button, LoadingOverlay, Text } from "@mantine/core";
-import { RichTextEditor } from "../../components/RichTextEditor";
+import { Badge, Button, Text } from "@/components/ui/core";
+import { LoadingOverlay } from "@mantine/core";
+import { RichTextEditor } from "@/components/ui/core/";
 import { useState } from "react";
-import {Tag, VoteType} from "@prisma/client";
+import { Tag, VoteType } from "@prisma/client";
 
 type PostProps = {
     initialContent: string;
@@ -60,7 +61,11 @@ const Post = (props: PostProps) => {
                             }
                         />
                     </button>
-                    <div className={"flex justify-center items-center my-4 select-none"}>
+                    <div
+                        className={
+                            "flex justify-center items-center my-4 select-none"
+                        }
+                    >
                         <Text className={"text-xl"}>{votesCount}</Text>
                     </div>
                     <button
@@ -99,7 +104,6 @@ const Post = (props: PostProps) => {
                     {editable && (
                         <div className={"flex justify-end mb-6"}>
                             <Button
-                                className={"bg-blue-500"}
                                 onClick={() => handleEditPost(postContent)}
                                 loading={isLoading}
                                 disabled={isLoading}
@@ -147,9 +151,7 @@ const Post = (props: PostProps) => {
                                             className={
                                                 "cursor-pointer select-none group"
                                             }
-                                            onClick={() =>
-                                                handleDeletePost()
-                                            }
+                                            onClick={() => handleDeletePost()}
                                         >
                                             <Text
                                                 className={

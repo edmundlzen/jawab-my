@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Layout } from "../../components/Layout";
-import { Text } from "@mantine/core";
+import { Text } from "@/components/ui/core";
 import { trpc } from "../../utils/trpc";
 import { Tabs } from "@mantine/core";
 import { Icon } from "@iconify/react";
@@ -67,37 +67,59 @@ const Profile: NextPage<ProfileProps> = () => {
                         </Text>
                     </div>
                 </div>
-                <Tabs className="mt-4" styles={{ body: { paddingTop: 0 } }}>
-                    <Tabs.Tab
-                        label="Profile"
-                        icon={<Icon icon="carbon:user-avatar-filled" />}
-                    >
+                <Tabs className="mt-4" defaultValue={"profile"}>
+                    <Tabs.List>
+                        <Tabs.Tab
+                            value="profile"
+                            icon={<Icon icon="carbon:user-avatar-filled" />}
+                        >
+                            Profile
+                        </Tabs.Tab>
+                        <Tabs.Tab
+                            value="settings"
+                            icon={<Icon icon="clarity:settings-solid" />}
+                        >
+                            Settings
+                        </Tabs.Tab>
+                        <Tabs.Tab
+                            value="questions"
+                            icon={<Icon icon="bi:question-circle-fill" />}
+                        >
+                            Questions
+                        </Tabs.Tab>
+                        <Tabs.Tab
+                            value="answers"
+                            icon={<Icon icon="ic:round-question-answer" />}
+                        >
+                            Answers
+                        </Tabs.Tab>
+                        <Tabs.Tab
+                            value="voted"
+                            icon={<Icon icon="fluent:vote-24-filled" />}
+                        >
+                            Voted
+                        </Tabs.Tab>
+                    </Tabs.List>
+
+                    <Tabs.Panel value="profile">
                         <ProfileTab />
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        label="Settings"
-                        icon={<Icon icon="clarity:settings-solid" />}
-                    >
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="settings">
                         <SettingsTab />
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        label="Questions"
-                        icon={<Icon icon="bi:question-circle-fill" />}
-                    >
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="questions">
                         <QuestionsTab questions={user.data.questions} />
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        label="Answers"
-                        icon={<Icon icon="ic:round-question-answer" />}
-                    >
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="answers">
                         <AnswersTab answers={user.data.answers} />
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        label="Voted"
-                        icon={<Icon icon="fluent:vote-24-filled" />}
-                    >
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="voted">
                         <VotedTab />
-                    </Tabs.Tab>
+                    </Tabs.Panel>
                 </Tabs>
             </div>
         </Layout>

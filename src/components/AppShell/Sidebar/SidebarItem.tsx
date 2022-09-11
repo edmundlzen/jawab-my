@@ -1,4 +1,4 @@
-import { Badge, Text } from "@mantine/core";
+import { Badge, Text } from "@/components/ui/core";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";

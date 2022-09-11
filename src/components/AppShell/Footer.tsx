@@ -1,4 +1,4 @@
-import { Text } from "@mantine/core";
+import { Text } from "@/components/ui/core";
 
 type FooterProps = {};
 

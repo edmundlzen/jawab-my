@@ -1,4 +1,5 @@
-import { Button, Text, Textarea } from "@mantine/core";
+import { Button, Text } from "@/components/ui/core";
+import { Textarea } from "@mantine/core";
 import moment from "moment";
 import { useState } from "react";
 import { showNotification } from "@mantine/notifications";
@@ -202,7 +203,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
                             onChange={(e) => setCommentContent(e.target.value)}
                         />
                         <Button
-                            className={"bg-blue-500 ml-3 mt-2"}
+                            className={"ml-3 mt-2"}
                             onClick={() => {
                                 handleCommentSubmit();
                             }}
